@@ -8,17 +8,17 @@ return [
     'parent_folder' => 'Outfits',
     'wait_seconds' => 5,
     'people' => [
-        ['id' => 'layla',   'name' => 'Layla'],
-        ['id' => 'jerome',  'name' => 'Jérôme'],
-        ['id' => 'cindy',   'name' => 'Cindy'],
-        ['id' => 'caprica', 'name' => 'Caprica'],
+        ['id' => 'layla',   'name' => 'Layla',      'img' => 'Layla'],
+        ['id' => 'jerome',  'name' => 'Jérôme',     'img' => 'Steampilot'],
+        ['id' => 'cindy',   'name' => 'Cindy',      'img' => 'Cindy'],
+        ['id' => 'caprica', 'name' => 'Caprica',    'img' => 'Caprica'],
     ],
     'outfits' => [
         [
             'id' => 'signature-casual',
             'who' => 'layla',
             'name' => 'Signature Casual',
-            'folder' => 'Signature Casual',
+            'folder' => 'default',
             'desc' => 'Rote Lederjacke, Denim-Skirt, rote Stiefel',
             'wear' => true,
         ],
@@ -26,7 +26,7 @@ return [
             'id' => 'spicy-black',
             'who' => 'layla',
             'name' => 'Spicy Black',
-            'folder' => 'Spicy Black',
+            'folder' => 'black',
             'desc' => 'Schwarze Lederjacke, rotes Top, schwarzer Rock',
             'wear' => true,
         ],
@@ -34,15 +34,23 @@ return [
             'id' => 'white-negligee',
             'who' => 'layla',
             'name' => 'Weisses Negligé',
-            'folder' => 'White Negligee',
+            'folder' => 'neglige',
             'desc' => 'Weisses Negligé mit Spitze, barfuss',
+            'wear' => true,
+        ],
+        [
+            'id' => 'naket',
+            'who' => 'layla',
+            'name' => 'Nackt',
+            'folder' => 'naket',
+            'desc' => 'Ohne Kleidung, Chain heart bleibt',
             'wear' => true,
         ],
         [
             'id' => 'saint-celestine',
             'who' => 'jerome',
             'name' => 'Saint Celestine',
-            'folder' => 'Saint Celestine',
+            'folder' => 'jacket',
             'desc' => 'Braune Fliegerjacke, dunkles Hemd, blaue Jeans',
             'wear' => true,
         ],
@@ -50,11 +58,12 @@ return [
             'id' => 'caprica-shirt',
             'who' => 'jerome',
             'name' => 'Caprica Shirt',
-            'folder' => 'Caprica Shirt',
+            'folder' => 'tshirt',
             'desc' => 'Schwarzes Bandshirt mit Caprica-Motiv',
             'wear' => true,
         ],
         // Cindy- und Caprica-Looks kommen dazu, sobald die Bilder generiert sind.
-        // Format: Vorderansicht, 832×1248, Datei web/img/<id>.webp
+        // Format: Vorderansicht, 832×1248, Datei web/img/<Person>/<SL-Ordner>.webp
+        // Personenordner: Layla, Steampilot, Cindy, Caprica. Dateiname = SL-Ordner (default, black, jacket, …).
     ],
 ];

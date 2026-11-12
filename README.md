@@ -14,27 +14,28 @@ Den Inhalt von `web/` nach `steampilot.ch/garderobe/` legen. Die Datei `web/api/
 
 Vier Reiter: **Layla**, **Jérôme**, **Cindy**, **Caprica**.
 
-Bereits mit Bildern (alle 832×1248, nur Vorderansicht):
+Bilder liegen unter `web/img/<Person>/<SL-Ordner>.webp`, Vorderansicht **832×1248**. Personenordner: `Layla`, `Steampilot`, `Cindy`, `Caprica`. Der Dateiname ist genau der Second-Life-Ordner:
 
-- Layla: `Signature Casual`, `Spicy Black`, `White Negligee`
-- Jérôme: `Saint Celestine`, `Caprica Shirt`
+- Layla: `default`, `black`, `neglige`, `naket`
+- Steampilot (Jérôme): `jacket`, `tshirt`
 
-Cindy- und Caprica-Bilder kommen nach, sobald sie generiert sind. Format: Vorderansicht, **832×1248**, Datei `web/img/<id>.webp`, Eintrag in `web/api/config.php`.
+Cindy- und Caprica-Bilder kommen nach, sobald sie generiert sind — gleicher Pfad, Eintrag in `web/api/config.php` (`folder` = SL-Ordnername, `who` = layla / jerome / cindy / caprica).
 
 ## 3. Ordner in Second Life
 
-Jeder Avatar hat unter `#RLV` einen eigenen Ordner `Outfits`, darin je einen Ordner — Namen genau so:
+Jeder Avatar hat unter `#RLV` einen eigenen Ordner `Outfits`, darin je einen Ordner — Namen genau ein Wort, kleingeschrieben:
 
 Layla:
 
-- `Signature Casual`
-- `Spicy Black`
-- `White Negligee`
+- `default` (rote Jacke)
+- `black` (schwarze Jacke)
+- `neglige`
+- `naket`
 
 Jérôme (Steampilot Mysterious):
 
-- `Saint Celestine`
-- `Caprica Shirt`
+- `jacket` (Saint Celestine)
+- `tshirt` (Caprica Shirt)
 
 Hinein: Kopien (oder Links) der Kleidung. Das OpenCollar und das Chain-heart-Halsband kommen **nicht** in diese Ordner und werden nicht ausgezogen. Das Skript macht nur:
 

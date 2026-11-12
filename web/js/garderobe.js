@@ -29,7 +29,12 @@
 
   const list = () => all.filter((o) => o.who === who);
   const current = () => list()[index] || null;
-  const imgUrl = (id) => 'img/' + encodeURIComponent(id) + '.webp';
+  const imgDir = (whoId) => {
+    const p = people.find((x) => x.id === whoId);
+    if (p && p.img) return p.img;
+    return ({ layla: 'Layla', jerome: 'Steampilot', cindy: 'Cindy', caprica: 'Caprica' })[whoId] || whoId;
+  };
+  const imgUrl = (o) => 'img/' + encodeURIComponent(imgDir(o.who)) + '/' + encodeURIComponent(o.folder) + '.webp';
   const personName = (id) => (people.find((p) => p.id === id) || { name: id }).name;
 
   function setStatus(text, kind) {
@@ -68,7 +73,7 @@
     const o = items[index];
     const incoming = frontIsA ? imgB : imgA;
     const outgoing = frontIsA ? imgA : imgB;
-    incoming.src = imgUrl(o.id);
+    incoming.src = imgUrl(o);
     incoming.alt = o.name;
     const reveal = () => {
       incoming.classList.add('on');

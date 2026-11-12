@@ -42,7 +42,9 @@ function people_ids(array $config): array {
 function public_people(array $config): array {
     $out = [];
     foreach ($config['people'] ?? [] as $p) {
-        $out[] = ['id' => $p['id'], 'name' => $p['name']];
+        $row = ['id' => $p['id'], 'name' => $p['name']];
+        if (!empty($p['img'])) $row['img'] = $p['img'];
+        $out[] = $row;
     }
     return $out;
 }
@@ -61,6 +63,7 @@ function public_outfits(array $config): array {
             'id' => $o['id'],
             'who' => $o['who'],
             'name' => $o['name'],
+            'folder' => $o['folder'],
             'desc' => $o['desc'],
             'wear' => !empty($o['wear']),
         ];
