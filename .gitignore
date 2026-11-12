@@ -1,0 +1,7 @@
+# echter Token bleibt lokal, nicht auf GitHub
+web/api/config.php
+web/data/*.txt
+web/data/*.log
+.secrets-local
+shots/
+*.zip

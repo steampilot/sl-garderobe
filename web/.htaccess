@@ -1,0 +1,16 @@
+# Garderobe — no listing, no index, config.php bleibt geschützt
+Options -Indexes
+DirectoryIndex index.php
+
+<IfModule mod_headers.c>
+  Header set X-Robots-Tag "noindex, nofollow, noarchive"
+</IfModule>
+
+<FilesMatch "^(config\.php|README\.md|.*\.lsl)$">
+  <IfModule mod_authz_core.c>
+    Require all denied
+  </IfModule>
+  <IfModule !mod_authz_core.c>
+    Deny from all
+  </IfModule>
+</FilesMatch>
