@@ -61,14 +61,6 @@ return [
             'wear' => true,
         ],
         [
-            'id' => 'western',
-            'who' => 'layla',
-            'name' => 'Western',
-            'folder' => 'western',
-            'desc' => 'BLauer Cowboyhut, kariertes Hemd, Jeans-Shorts, blaue Stiefel',
-            'wear' => true,
-        ],
-        [
             'id' => 'naked',
             'who' => 'layla',
             'name' => 'Nackt',
