@@ -45,6 +45,14 @@ return [
             'wear' => true,
         ],
         [
+            'id' => 'white-negligee',
+            'who' => 'layla',
+            'name' => 'Weisses Negligé',
+            'folder' => 'negligee',
+            'desc' => 'Weisses Negligé mit Spitze, barfuss',
+            'wear' => true,
+        ],
+        [
             'id' => 'bikini',
             'who' => 'layla',
             'name' => 'Bikini',
@@ -53,11 +61,11 @@ return [
             'wear' => true,
         ],
         [
-            'id' => 'white-negligee',
+            'id' => 'western',
             'who' => 'layla',
-            'name' => 'Weisses Negligé',
-            'folder' => 'negligee',
-            'desc' => 'Weisses Negligé mit Spitze, barfuss',
+            'name' => 'Western',
+            'folder' => 'western',
+            'desc' => 'BLauer Cowboyhut, kariertes Hemd, Jeans-Shorts, blaue Stiefel',
             'wear' => true,
         ],
         [
@@ -68,8 +76,23 @@ return [
             'desc' => 'Ohne Kleidung, Chain heart bleibt',
             'wear' => true,
         ],
-        // Weitere Personen später so ergänzen:
-        // ['id' => 'saint-celestine', 'who' => 'jerome', 'name' => 'Saint Celestine', 'folder' => 'jacket', 'desc' => '…', 'wear' => true],
+        [
+            'id' => 'saint-celestine',
+            'who' => 'jerome',
+            'name' => 'Saint Celestine',
+            'folder' => 'jacket',
+            'desc' => 'Braune Fliegerjacke, dunkles Hemd, blaue Jeans',
+            'wear' => true,
+        ],
+        [
+            'id' => 'caprica-shirt',
+            'who' => 'jerome',
+            'name' => 'Caprica Shirt',
+            'folder' => 'tshirt',
+            'desc' => 'Schwarzes Bandshirt mit Caprica-Motiv',
+            'wear' => true,
+        ],
+        // Cindy- und Caprica-Looks kommen dazu, sobald die Bilder generiert sind.
         // Format: Vorderansicht, 832×1248, Datei web/img/<Person>/<SL-Ordner>.webp oder .png
         // Personenordner: Layla (weitere: Steampilot, Cindy, Caprica).
     ],
