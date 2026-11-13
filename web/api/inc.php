@@ -56,6 +56,47 @@ function outfit_by_id(array $config, string $id): ?array {
     return null;
 }
 
+function person_img_dir(array $config, string $who): string {
+    foreach ($config['people'] ?? [] as $p) {
+        if (($p['id'] ?? '') === $who && !empty($p['img'])) {
+            return (string)$p['img'];
+        }
+    }
+    $fallback = ['layla' => 'Layla', 'jerome' => 'Steampilot', 'cindy' => 'Cindy', 'caprica' => 'Caprica'];
+    return $fallback[$who] ?? $who;
+}
+
+// Relativer Pfad ab web/, z. B. img/Layla/western.png. Prüft die echte Datei (webp/png/jpg).
+function outfit_image_url(array $config, array $o): string {
+    $folder = (string)($o['folder'] ?? '');
+    $imgDir = person_img_dir($config, (string)($o['who'] ?? ''));
+    $webRoot = dirname(__DIR__);
+    $candidates = [];
+    if (!empty($o['image'])) {
+        $img = (string)$o['image'];
+        if (str_contains($img, '/')) {
+            $rel = ltrim($img, '/');
+            if (!str_starts_with($rel, 'img/')) {
+                $rel = 'img/' . $rel;
+            }
+            $candidates[] = $rel;
+        } else {
+            $candidates[] = 'img/' . $imgDir . '/' . $img;
+        }
+    }
+    foreach (['.webp', '.png', '.jpg', '.jpeg'] as $ext) {
+        if ($folder !== '') {
+            $candidates[] = 'img/' . $imgDir . '/' . $folder . $ext;
+        }
+    }
+    foreach (array_unique($candidates) as $rel) {
+        if (is_file($webRoot . '/' . $rel)) {
+            return $rel;
+        }
+    }
+    return 'img/' . $imgDir . '/' . $folder . '.webp';
+}
+
 function public_outfits(array $config): array {
     $out = [];
     foreach ($config['outfits'] as $o) {
@@ -65,7 +106,7 @@ function public_outfits(array $config): array {
             'who' => $o['who'],
             'name' => $o['name'],
             'folder' => $folder,
-            'image' => (string)($o['image'] ?? ($folder . '.webp')),
+            'image' => outfit_image_url($config, $o),
             'desc' => $o['desc'],
             'wear' => !empty($o['wear']),
         ];

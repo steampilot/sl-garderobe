@@ -16,7 +16,7 @@ Wenn `config.php` schon existiert, die Werte aus dem Example nachziehen: `parent
 
 Vier Reiter: **Layla**, **Jérôme**, **Cindy**, **Caprica**.
 
-Bilder liegen unter `web/img/<Person>/<SL-Ordner>.webp`, Vorderansicht **832×1248**. Personenordner: `Layla`, `Steampilot`, `Cindy`, `Caprica`. Der Dateiname ist genau der Second-Life-Ordner. Abweichende Endung (z. B. `.png`) steht in `config.php` unter `image`.
+Bilder liegen unter `web/img/<Person>/<SL-Ordner>.webp` oder `.png`, Vorderansicht **832×1248**. Personenordner: `Layla`, `Steampilot`, `Cindy`, `Caprica`. Der Dateiname ist genau der Second-Life-Ordner. Die App findet die Endung selbst; ein abweichender Name kann in `config.php` unter `image` stehen.
 
 - Layla: `default`, `black`, `western` (Bild: `western.png`), `negligee`, `naked`
 - Steampilot (Jérôme): `jacket`, `tshirt`

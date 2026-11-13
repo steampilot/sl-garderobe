@@ -35,6 +35,7 @@ return [
             'who' => 'layla',
             'name' => 'Western',
             'folder' => 'western',
+            'image' => 'western.png',
             'desc' => 'Blauer Cowboyhut, kariertes Hemd, Jeans-Shorts, blaue Stiefel',
             'wear' => true,
         ],
