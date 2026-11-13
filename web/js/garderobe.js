@@ -34,7 +34,7 @@
     if (p && p.img) return p.img;
     return ({ layla: 'Layla', jerome: 'Steampilot', cindy: 'Cindy', caprica: 'Caprica' })[whoId] || whoId;
   };
-  const imgUrl = (o) => 'img/' + encodeURIComponent(imgDir(o.who)) + '/' + encodeURIComponent(o.folder) + '.webp';
+  const imgUrl = (o) => 'img/' + encodeURIComponent(imgDir(o.who)) + '/' + encodeURIComponent(o.image || (o.folder + '.webp'));
   const personName = (id) => (people.find((p) => p.id === id) || { name: id }).name;
 
   function setStatus(text, kind) {

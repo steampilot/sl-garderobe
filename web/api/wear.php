@@ -28,6 +28,7 @@ $folder = (string)$o['folder'];
 $who = (string)$o['who'];
 $parent = (string)$config['parent_folder'];
 $wait = (int)$config['wait_seconds'];
+$detach = clothing_folders($config, $who);
 $url = lsl_url($who);
 $lslOk = false;
 $lslDetail = '';
@@ -37,6 +38,7 @@ if ($url !== '') {
         'token' => $config['token'],
         'folder' => $folder,
         'parent' => $parent,
+        'detach' => implode(',', $detach),
         'wait' => $wait,
         'id' => $id,
         'who' => $who,

@@ -5,7 +5,7 @@ return [
     'token' => 'PASTE_YOUR_TOKEN',
     'notify_email' => 'layla.strange+garderobe@mail.grokbot.com',
     'mail_from' => 'garderobe@steampilot.ch',
-    'parent_folder' => 'Outfits',
+    'parent_folder' => '.outfits',
     'wait_seconds' => 5,
     'people' => [
         ['id' => 'layla',   'name' => 'Layla',      'img' => 'Layla'],
@@ -31,18 +31,26 @@ return [
             'wear' => true,
         ],
         [
+            'id' => 'western',
+            'who' => 'layla',
+            'name' => 'Western',
+            'folder' => 'western',
+            'desc' => 'Blauer Cowboyhut, kariertes Hemd, Jeans-Shorts, blaue Stiefel',
+            'wear' => true,
+        ],
+        [
             'id' => 'white-negligee',
             'who' => 'layla',
             'name' => 'Weisses Negligé',
-            'folder' => 'neglige',
+            'folder' => 'negligee',
             'desc' => 'Weisses Negligé mit Spitze, barfuss',
             'wear' => true,
         ],
         [
-            'id' => 'naket',
+            'id' => 'naked',
             'who' => 'layla',
             'name' => 'Nackt',
-            'folder' => 'naket',
+            'folder' => 'naked',
             'desc' => 'Ohne Kleidung, Chain heart bleibt',
             'wear' => true,
         ],
@@ -63,7 +71,7 @@ return [
             'wear' => true,
         ],
         // Cindy- und Caprica-Looks kommen dazu, sobald die Bilder generiert sind.
-        // Format: Vorderansicht, 832×1248, Datei web/img/<Person>/<SL-Ordner>.webp
-        // Personenordner: Layla, Steampilot, Cindy, Caprica. Dateiname = SL-Ordner (default, black, jacket, …).
+        // Format: Vorderansicht, 832×1248, Datei web/img/<Person>/<SL-Ordner>.webp oder .png
+        // Personenordner: Layla, Steampilot, Cindy, Caprica. Dateiname = SL-Ordner (default, black, western, …).
     ],
 ];

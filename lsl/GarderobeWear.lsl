@@ -8,17 +8,19 @@
 // falls die automatische Erkennung nicht greift: "layla", "jerome",
 // "cindy" oder "caprica".
 //
-// Bei WEAR auf der Website:
-//   1. @detachall:Outfits=force
+// Bei WEAR auf der Website (OpenCollar-Konvention #RLV/.outfits):
+//   1. für jeden Kleidungs-Ordner ausser .core:
+//      @detachall:.outfits/<Ordner>=force
 //   2. fünf Sekunden warten
-//   3. @attachallover:Outfits/<Foldername>=force
+//   3. @attachallover:.outfits/<Foldername>=force
 //
-// Nur der Ordner "Outfits" unter #RLV wird angefasst.
 // Niemals @detachall ohne Ordner — sonst fielen Halsband und Collar.
+// Niemals @detachall:.outfits=force — unter .outfits liegt .core
+// (Body, Skin, Shape) und darf nicht ausgezogen werden.
 
 string  SITE   = "https://www.steampilot.ch/garderobe/api/register.php";
 string  TOKEN  = "PASTE_YOUR_TOKEN";
-string  PARENT = "Outfits";   // #RLV/Outfits/<Foldername>
+string  PARENT = ".outfits";  // #RLV/.outfits/<Foldername>
 float   WAIT   = 5.0;
 string  WHO    = "";          // leer = automatisch nach Besitzername
 
@@ -50,6 +52,15 @@ string safeName(string s)
             out += c;
     }
     return out;
+}
+
+// Kleidungs-Ordner: kein führender Punkt, also nie .core.
+integer isSafeFolder(string s)
+{
+    if (s == "") return FALSE;
+    if (llGetSubString(s, 0, 0) == ".") return FALSE;
+    if (llToLower(s) == "core") return FALSE;
+    return TRUE;
 }
 
 register()
@@ -131,6 +142,7 @@ default
         string token;
         string folder;
         string parent = PARENT;
+        string detachRaw;
         float wait = WAIT;
 
         list parts = llParseString2List(body, ["&"], []);
@@ -146,6 +158,7 @@ default
                 if (k == "token")  token  = v;
                 if (k == "folder") folder = v;
                 if (k == "parent") parent = v;
+                if (k == "detach") detachRaw = v;
                 if (k == "wait")   wait   = (float)v;
             }
         }
@@ -158,7 +171,8 @@ default
 
         folder = safeName(folder);
         parent = safeName(parent);
-        if (folder == "" || parent == "")
+        // Nur der OpenCollar-Ordner .outfits, und nie ein versteckter Unterordner wie .core.
+        if (folder == "" || !isSafeFolder(folder) || parent != ".outfits")
         {
             llHTTPResponse(id, 400, "{\"ok\":false,\"error\":\"folder\"}");
             return;
@@ -174,9 +188,23 @@ default
         WAIT = wait;
         PARENT = parent;
 
-        // Nur den Outfits-Ordner ausziehen, niemals @detachall ohne Pfad.
-        llOwnerSay("@detachall:" + parent + "=force");
-        llOwnerSay("Garderobe: ziehe " + parent + " aus, ziehe " + folder + " in " + (string)((integer)wait) + " Sekunden an.");
+        // Kleidungs-Ordner einzeln ausziehen. Niemals @detachall ohne Pfad
+        // und niemals den ganzen .outfits-Baum (dort liegt .core).
+        list detachFolders = llParseString2List(detachRaw, [","], []);
+        integer n = llGetListLength(detachFolders);
+        integer detached = 0;
+        for (i = 0; i < n; i += 1)
+        {
+            string f = safeName(llList2String(detachFolders, i));
+            if (isSafeFolder(f))
+            {
+                llOwnerSay("@detachall:" + parent + "/" + f + "=force");
+                detached += 1;
+            }
+        }
+        if (detached == 0)
+            llOwnerSay("@detachall:" + parent + "/" + folder + "=force");
+        llOwnerSay("Garderobe: ziehe Kleidung aus, ziehe " + folder + " in " + (string)((integer)wait) + " Sekunden an.");
         llSetTimerEvent(wait);
     }
 

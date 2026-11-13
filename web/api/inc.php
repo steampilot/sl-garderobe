@@ -59,16 +59,31 @@ function outfit_by_id(array $config, string $id): ?array {
 function public_outfits(array $config): array {
     $out = [];
     foreach ($config['outfits'] as $o) {
+        $folder = (string)$o['folder'];
         $out[] = [
             'id' => $o['id'],
             'who' => $o['who'],
             'name' => $o['name'],
-            'folder' => $o['folder'],
+            'folder' => $folder,
+            'image' => (string)($o['image'] ?? ($folder . '.webp')),
             'desc' => $o['desc'],
             'wear' => !empty($o['wear']),
         ];
     }
     return $out;
+}
+
+// Kleidungs-Ordner eines Avatars zum Ausziehen. Nie .core oder andere Punkt-Ordner.
+function clothing_folders(array $config, string $who): array {
+    $folders = [];
+    foreach ($config['outfits'] as $o) {
+        if ((string)$o['who'] !== $who) continue;
+        $f = (string)$o['folder'];
+        if ($f === '' || $f[0] === '.') continue;
+        if (strtolower($f) === 'core') continue;
+        if (!in_array($f, $folders, true)) $folders[] = $f;
+    }
+    return $folders;
 }
 
 function lsl_url(?string $who = null): string {
