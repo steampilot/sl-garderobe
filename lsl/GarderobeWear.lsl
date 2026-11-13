@@ -12,6 +12,10 @@
 //   2. fünf Sekunden warten
 //   3. @attachallover:Outfits/<Foldername>=force
 //
+// Bei PING (op=ping): antwortet mit ok, Regionsname und den
+// per @getinvworn:Outfits / @getinvworn:Stuff getragenen Ordnern
+// (Flag 3 oder 30 = angezogen, 0 = nicht).
+//
 // Bei STUFF (op=add / op=remove), ohne das Outfit zu ersetzen:
 //   add:    @attachallover:Stuff/<Foldername>=force
 //   remove: @detachall:Stuff/<Foldername>=force
@@ -29,6 +33,18 @@ string  WHO    = "";          // leer = automatisch nach Besitzername
 string  gUrl;
 string  gPending;
 integer gBusy;
+
+// Ping / @getinvworn auf privaten Channels (wie eine Hanger-Garderobe).
+integer CH_INV_OUTFITS;
+integer CH_WORN_OUTFITS;
+integer CH_INV_STUFF;
+integer CH_WORN_STUFF;
+key     gPingHttp;
+integer gPingWait;
+string  gInvOutfits;
+string  gWornOutfits;
+string  gInvStuff;
+string  gWornStuff;
 
 string detectWho()
 {
@@ -54,6 +70,159 @@ string safeName(string s)
             out += c;
     }
     return out;
+}
+
+integer chanBase()
+{
+    integer n = 0x60D30BE ^ (integer)("0x" + llGetSubString((string)llGetOwner(), 0, 7));
+    if (n >= 0) n = -1 - n;
+    if (n == 0) n = -26013;
+    return n;
+}
+
+integer flagWorn(string f)
+{
+    f = llStringTrim(f, STRING_TRIM);
+    if (f == "3" || f == "30" || f == "2" || f == "20") return TRUE;
+    string d = llGetSubString(f, 0, 0);
+    if (d == "2" || d == "3") return TRUE;
+    return FALSE;
+}
+
+list flagsFromWorn(string raw)
+{
+    raw = llStringTrim(raw, STRING_TRIM);
+    if (raw == "") return [];
+    if (llSubStringIndex(raw, ",") >= 0)
+        return llParseString2List(raw, [","], []);
+    integer len = llStringLength(raw);
+    list out;
+    integer i;
+    if (len >= 2 && (len % 2) == 0)
+    {
+        for (i = 0; i < len; i += 2)
+            out += llGetSubString(raw, i, i + 1);
+        return out;
+    }
+    for (i = 0; i < len; i++)
+        out += llGetSubString(raw, i, i);
+    return out;
+}
+
+list wornNames(string wornRaw, string invRaw, string skipName)
+{
+    list worn;
+    list parts = llParseString2List(wornRaw, [","], []);
+    integer i;
+    integer named = FALSE;
+    for (i = 0; i < llGetListLength(parts); i++)
+    {
+        string p = llStringTrim(llList2String(parts, i), STRING_TRIM);
+        integer bar = llSubStringIndex(p, "|");
+        if (bar > 0)
+        {
+            named = TRUE;
+            string name = llGetSubString(p, 0, bar - 1);
+            string flag = llGetSubString(p, bar + 1, -1);
+            if (llToLower(name) != llToLower(skipName) && flagWorn(flag))
+                worn += name;
+        }
+    }
+    if (named) return worn;
+
+    list flags = flagsFromWorn(wornRaw);
+    list names = llParseString2List(invRaw, [","], []);
+    integer offset = 0;
+    if (llGetListLength(flags) == llGetListLength(names) + 1) offset = 1;
+    integer n = llGetListLength(names);
+    if (llGetListLength(flags) - offset < n)
+        n = llGetListLength(flags) - offset;
+    for (i = 0; i < n; i++)
+    {
+        string name = llStringTrim(llList2String(names, i), STRING_TRIM);
+        string flag = llList2String(flags, i + offset);
+        if (name != "" && llToLower(name) != llToLower(skipName) && flagWorn(flag))
+            worn += name;
+    }
+    return worn;
+}
+
+string jsonEscape(string s)
+{
+    integer i;
+    string out;
+    for (i = 0; i < llStringLength(s); i++)
+    {
+        string c = llGetSubString(s, i, i);
+        if (c == "\\" || c == "\"") out += "\\";
+        if (c != "\n" && c != "\r") out += c;
+    }
+    return out;
+}
+
+string jsonNames(list names)
+{
+    string o = "[";
+    integer i;
+    for (i = 0; i < llGetListLength(names); i++)
+    {
+        if (i) o += ",";
+        o += "\"" + jsonEscape(llList2String(names, i)) + "\"";
+    }
+    return o + "]";
+}
+
+finishPing()
+{
+    if (gPingHttp == NULL_KEY) return;
+    list outfits = wornNames(gWornOutfits, gInvOutfits, "Outfits");
+    list stuff = wornNames(gWornStuff, gInvStuff, "Stuff");
+    string body = "{\"ok\":true,\"region\":\"" + jsonEscape(llGetRegionName())
+        + "\",\"outfits\":" + jsonNames(outfits)
+        + ",\"stuff\":" + jsonNames(stuff) + "}";
+    llHTTPResponse(gPingHttp, 200, body);
+    gPingHttp = NULL_KEY;
+    gPingWait = FALSE;
+}
+
+integer pingComplete()
+{
+    // getinvworn reicht; getinv ist nur Fallback, wenn die Antwort keine Namen hat.
+    return (gWornOutfits != "") && (gWornStuff != "");
+}
+
+startPing(key httpId)
+{
+    if (gPingWait && gPingHttp != NULL_KEY)
+        finishPing();
+    gPingHttp = httpId;
+    gPingWait = TRUE;
+    gInvOutfits = "";
+    gWornOutfits = "";
+    gInvStuff = "";
+    gWornStuff = "";
+    llOwnerSay("@getinv:Outfits=" + (string)CH_INV_OUTFITS);
+    llOwnerSay("@getinvworn:Outfits=" + (string)CH_WORN_OUTFITS);
+    llOwnerSay("@getinv:Stuff=" + (string)CH_INV_STUFF);
+    llOwnerSay("@getinvworn:Stuff=" + (string)CH_WORN_STUFF);
+    // Während eines Outfit-Wechsels den Wear-Timer nicht überschreiben.
+    if (gBusy)
+        finishPing();
+    else
+        llSetTimerEvent(2.0);
+}
+
+openListens()
+{
+    integer b = chanBase();
+    CH_INV_OUTFITS  = b;
+    CH_WORN_OUTFITS = b - 1;
+    CH_INV_STUFF    = b - 2;
+    CH_WORN_STUFF   = b - 3;
+    llListen(CH_INV_OUTFITS,  "", llGetOwner(), "");
+    llListen(CH_WORN_OUTFITS, "", llGetOwner(), "");
+    llListen(CH_INV_STUFF,    "", llGetOwner(), "");
+    llListen(CH_WORN_STUFF,   "", llGetOwner(), "");
 }
 
 register()
@@ -87,6 +256,9 @@ default
     {
         gBusy = FALSE;
         gPending = "";
+        gPingHttp = NULL_KEY;
+        gPingWait = FALSE;
+        openListens();
         requestUrl();
     }
 
@@ -107,6 +279,21 @@ default
             llOwnerSay("Garderobe: Registrierung fehlgeschlagen (" + (string)status + "). " + body);
     }
 
+    listen(integer ch, string name, key id, string msg)
+    {
+        if (!gPingWait) return;
+        if (ch == CH_INV_OUTFITS)  gInvOutfits  = msg;
+        else if (ch == CH_WORN_OUTFITS) gWornOutfits = msg;
+        else if (ch == CH_INV_STUFF)    gInvStuff    = msg;
+        else if (ch == CH_WORN_STUFF)   gWornStuff   = msg;
+        else return;
+        if (pingComplete())
+        {
+            if (!gBusy) llSetTimerEvent(0.0);
+            finishPing();
+        }
+    }
+
     http_request(key id, string method, string body)
     {
         if (method == URL_REQUEST_GRANTED)
@@ -124,11 +311,6 @@ default
         if (method != "POST")
         {
             llHTTPResponse(id, 405, "{\"ok\":false}");
-            return;
-        }
-        if (gBusy)
-        {
-            llHTTPResponse(id, 429, "{\"ok\":false,\"error\":\"busy\"}");
             return;
         }
 
@@ -162,6 +344,18 @@ default
             return;
         }
 
+        if (op == "ping")
+        {
+            startPing(id);
+            return;
+        }
+
+        if (gBusy)
+        {
+            llHTTPResponse(id, 429, "{\"ok\":false,\"error\":\"busy\"}");
+            return;
+        }
+
         folder = safeName(folder);
         parent = safeName(parent);
         if (folder == "" || parent == "")
@@ -172,6 +366,12 @@ default
         if (op != "add" && op != "remove") op = "wear";
         if (wait < 3.0) wait = 3.0;
         if (wait > 15.0) wait = 15.0;
+
+        if (gPingWait)
+        {
+            finishPing();
+            llSetTimerEvent(0.0);
+        }
 
         // Antwort sofort, dann erst der Wechsel — sonst läuft der HTTP-Timeout in die Wartezeit.
         llHTTPResponse(id, 200, "{\"ok\":true,\"folder\":\"" + folder + "\"}");
@@ -205,6 +405,8 @@ default
     timer()
     {
         llSetTimerEvent(0.0);
+        if (gPingWait)
+            finishPing();
         if (gPending == "") return;
         llOwnerSay("@attachallover:" + gPending + "=force");
         llOwnerSay("Garderobe: " + gPending + " angezogen.");

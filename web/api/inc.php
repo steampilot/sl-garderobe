@@ -159,7 +159,10 @@ function notify_layla(array $config, string $folder, string $id, string $who, bo
     @file_put_contents(data_path('wear.log'), $line, FILE_APPEND | LOCK_EX);
 }
 
-function garderobe_post_lsl(string $url, string $body, string $token): array {
+function garderobe_post_lsl(string $url, string $body, string $token, int $maxLen = 200, int $timeout = 12): array {
+    if ($maxLen < 80) $maxLen = 80;
+    if ($timeout < 2) $timeout = 2;
+    if ($timeout > 25) $timeout = 25;
     $headers = [
         'Content-Type: application/x-www-form-urlencoded',
         'X-Garderobe-Token: ' . $token,
@@ -170,8 +173,8 @@ function garderobe_post_lsl(string $url, string $body, string $token): array {
             CURLOPT_POST => true,
             CURLOPT_POSTFIELDS => $body,
             CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_CONNECTTIMEOUT => 5,
-            CURLOPT_TIMEOUT => 12,
+            CURLOPT_CONNECTTIMEOUT => min(5, $timeout),
+            CURLOPT_TIMEOUT => $timeout,
             CURLOPT_HTTPHEADER => $headers,
         ]);
         $resp = curl_exec($ch);
@@ -179,7 +182,7 @@ function garderobe_post_lsl(string $url, string $body, string $token): array {
         $code = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
         if ($resp === false) return [false, $err ?: 'keine Antwort'];
-        if ($code >= 200 && $code < 300) return [true, substr((string)$resp, 0, 200)];
+        if ($code >= 200 && $code < 300) return [true, substr((string)$resp, 0, $maxLen)];
         return [false, 'HTTP ' . $code . ' ' . substr((string)$resp, 0, 160)];
     }
     $ctx = stream_context_create([
@@ -187,7 +190,7 @@ function garderobe_post_lsl(string $url, string $body, string $token): array {
             'method' => 'POST',
             'header' => implode("\r\n", $headers),
             'content' => $body,
-            'timeout' => 12,
+            'timeout' => $timeout,
             'ignore_errors' => true,
         ],
     ]);
@@ -197,7 +200,7 @@ function garderobe_post_lsl(string $url, string $body, string $token): array {
         $code = (int)$m[1];
     }
     if ($resp === false && $code === 0) return [false, 'keine Antwort'];
-    if ($code >= 200 && $code < 300) return [true, substr((string)$resp, 0, 200)];
+    if ($code >= 200 && $code < 300) return [true, substr((string)$resp, 0, $maxLen)];
     return [false, 'HTTP ' . $code . ' ' . substr((string)$resp, 0, 160)];
 }
 
@@ -374,4 +377,43 @@ function parse_worn_list(string $raw): array {
         if ($part !== '') $ids[] = $part;
     }
     return $ids;
+}
+
+
+function parse_lsl_ping(string $raw): ?array {
+    $raw = trim($raw);
+    if ($raw === '') return null;
+    $start = strpos($raw, '{');
+    $end = strrpos($raw, '}');
+    if ($start === false || $end === false || $end <= $start) return null;
+    $data = json_decode(substr($raw, $start, $end - $start + 1), true);
+    if (!is_array($data) || empty($data['ok'])) return null;
+    $outfits = [];
+    $stuff = [];
+    if (isset($data['outfits']) && is_array($data['outfits'])) {
+        foreach ($data['outfits'] as $n) {
+            $n = trim((string)$n);
+            if ($n !== '') $outfits[] = $n;
+        }
+    }
+    if (isset($data['stuff']) && is_array($data['stuff'])) {
+        foreach ($data['stuff'] as $n) {
+            $n = trim((string)$n);
+            if ($n !== '') $stuff[] = $n;
+        }
+    }
+    return [
+        'region' => trim((string)($data['region'] ?? '')),
+        'outfits' => $outfits,
+        'stuff' => $stuff,
+        'worn_available' => array_key_exists('outfits', $data) || array_key_exists('stuff', $data),
+    ];
+}
+
+function maybe_mark_naked(array $config, array $wornOutfits, bool $wornAvailable): array {
+    if (!$wornAvailable || $wornOutfits) return $wornOutfits;
+    foreach ($config['outfits'] ?? [] as $o) {
+        if ((string)($o['folder'] ?? '') === 'naked') return ['naked'];
+    }
+    return $wornOutfits;
 }

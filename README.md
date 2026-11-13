@@ -10,9 +10,7 @@ Kein PIN. Die Seite wird nicht von Suchmaschinen indexiert.
 
 Den Inhalt von `web/` nach `steampilot.ch/garderobe/` legen. Die Datei `web/api/config.example.php` nach `web/api/config.php` kopieren und dort den Token eintragen — derselbe gehört ins LSL-Skript. Den echten Token nicht auf GitHub legen.
 
-Wenn `config.php` schon existiert, die Werte aus dem Example nachziehen: `parent_folder` (`Outfits`), `bot_url`, `stuff_parent`, die Stuff-Einträge und nur noch Layla unter `people` / `outfits`.
-
-`bot_url` ist die vom **Webserver** erreichbare URL der slbot-Befehlsschnittstelle (Standard `http://127.0.0.1:8765/`). Läuft der Bot auf einem anderen Rechner, hier den Tunnel oder Proxy eintragen. Ohne erreichbare URL bleibt das Statuslicht grau, und der WEAR-Button kennt das aktuelle Outfit nicht.
+Wenn `config.php` schon existiert, die Werte aus dem Example nachziehen: `parent_folder` (`Outfits`), `stuff_parent`, die Stuff-Einträge und nur noch Layla unter `people` / `outfits`. `bot_url` ist optional und nicht nötig.
 
 ## 2. Sektionen
 
@@ -72,24 +70,22 @@ Der Button spricht das Skript im OpenCollar an **und** schickt mir eine Nachrich
 
 ## 6. Statuslicht und aktuelles Outfit
 
-Oben neben dem Titel sitzt ein Punkt, den die Seite etwa alle 30 Sekunden über `api/status.php` prüft:
+Oben neben dem Titel sitzt ein Punkt, den die Seite etwa alle 30 Sekunden über `api/status.php` prüft. Der Aufruf pingt das Skript im OpenCollar über die registrierte HTTP-in-URL — derselbe Weg wie WEAR, wie bei einer Hanger-Garderobe. Der Webserver muss slbot dafür nicht erreichen.
 
-- **grün**, wenn slbot läuft **und** mit Second Life verbunden ist; daneben der Regionsname
-- **rot**, wenn der Client läuft, aber offline ist
-- **grau**, wenn der Client nicht erreichbar ist (Prozess aus, Timeout, oder `bot_url` kommt vom Webserver nicht durch)
+- **grün**, wenn das Collar-Skript innerhalb des Timeouts antwortet (Avatar ist in Second Life); daneben der Regionsname
+- **grau**, wenn keine URL registriert ist, die URL veraltet ist oder das Skript nicht antwortet
 
-Derselbe Aufruf fragt den Bot nach `outfit-worn` (read-only). Ein Outfit-Ordner gilt als angezogen, wenn mindestens die Hälfte seiner Kleidungs- und Attachment-Items gerade getragen wird. Ein leerer Ordner `naked` gilt als angezogen, wenn kein anderes Outfit-Item an ist. Stuff-Ordner werden genauso erkannt.
+Derselbe Ping fragt per RLV `@getinvworn:Outfits` und `@getinvworn:Stuff` auf einem privaten Channel die getragenen Ordner ab. Ein Flag `3` oder `30` bedeutet angezogen, `0` nicht. Ein leerer Ordner `naked` gilt als angezogen, wenn kein anderes Outfit-Item an ist. Der WEAR-Button des aktuell getragenen Outfits ist **grün**, alle anderen **rot**. Im Stuff-Menü ist ein angehängter Eintrag ebenfalls grün markiert.
 
-Der WEAR-Button des aktuell getragenen Outfits ist **grün**, alle anderen **rot**. Im Stuff-Menü ist ein angehängter Eintrag ebenfalls grün markiert.
+Nach Teleport, Regionswechsel oder Regions-Neustart wird die HTTP-in-URL ungültig. Das Skript holt sich dann von allein eine neue und registriert sich erneut bei der Website (`CHANGED_REGION`, `CHANGED_TELEPORT`, `CHANGED_REGION_START`). Bis die neue URL ankommt, kann das Licht kurz grau bleiben.
 
-Dafür braucht slbot den Befehl `outfit-worn`. Der steht in der aktuellen Binary; wirksam wird er erst nach dem nächsten Bot-Neustart. Bis dahin bleibt die Erkennung leer, das Statuslicht funktioniert trotzdem über `status`.
+`bot_url` / slbot `outfit-worn` ist nur noch ein optionaler Fallback, falls der Webserver den Bot wirklich erreicht und der Collar-Ping die Flags nicht liefert.
 
 ## 7. In die bestehende config.php übernehmen
 
-Diese Schlüssel in die Live-`config.php` legen (Token und Mail-Adressen nicht überschreiben). Andere Avatare aus `people` und `outfits` entfernen.
+Diese Schlüssel in die Live-`config.php` legen (Token und Mail-Adressen nicht überschreiben). Andere Avatare aus `people` und `outfits` entfernen. `bot_url` wird nicht mehr gebraucht.
 
 ```php
-    'bot_url' => 'http://127.0.0.1:8765/',
     'stuff_parent' => 'Stuff',
     'people' => [
         ['id' => 'layla', 'name' => 'Layla', 'img' => 'Layla'],
@@ -110,4 +106,4 @@ Diese Schlüssel in die Live-`config.php` legen (Token und Mail-Adressen nicht �
     ],
 ```
 
-`bot_url` anpassen, falls der Webserver den Bot nicht unter `127.0.0.1:8765` erreicht. Die Layla-Outfits bleiben wie bisher; nur Jérôme-, Cindy- und Caprica-Einträge streichen.
+Die Layla-Outfits bleiben wie bisher; nur Jérôme-, Cindy- und Caprica-Einträge streichen. Ausserdem das aktualisierte `lsl/GarderobeWear.lsl` ins OpenCollar legen — ohne das neue Skript bleiben Statuslicht und die Erkennung des Outfits grau, und STUFF-ADD/REMOVE fehlen.
