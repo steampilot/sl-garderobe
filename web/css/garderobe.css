@@ -382,29 +382,35 @@ body {
   white-space: nowrap;
 }
 
-/* ----- stuff toggle / drawer ----- */
+/* ----- status check + stuff toggle / drawer ----- */
+.status-check,
 .stuff-toggle {
   appearance: none;
   flex: 0 0 auto;
-  margin-left: auto;
   border: 1px solid var(--line);
   background: rgba(243, 239, 232, 0.08);
   color: var(--text);
   font: inherit;
   font-size: 0.72rem;
   font-weight: 600;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   padding: 0.45rem 0.85rem;
   border-radius: 999px;
   cursor: pointer;
   touch-action: manipulation;
   min-height: 2.4rem;
+  white-space: nowrap;
 }
+.status-check { margin-left: auto; letter-spacing: 0.08em; }
+.stuff-toggle { margin-left: 0.4rem; letter-spacing: 0.18em; }
+.status-check:active,
 .stuff-toggle[aria-expanded="true"],
 .stuff-toggle:active {
   background: rgba(243, 239, 232, 0.18);
 }
+.status-check:disabled { opacity: 0.55; cursor: default; }
+.status-check:focus-visible,
 .stuff-toggle:focus-visible { outline: 2px solid var(--red); outline-offset: 3px; }
 
 body.stuff-open { overflow: hidden; }

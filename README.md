@@ -70,7 +70,7 @@ Der Button spricht das Skript im OpenCollar an **und** schickt mir eine Nachrich
 
 ## 6. Statuslicht und aktuelles Outfit
 
-Oben neben dem Titel sitzt ein Punkt, den die Seite etwa alle 30 Sekunden über `api/status.php` prüft. Der Aufruf pingt das Skript im OpenCollar über die registrierte HTTP-in-URL — derselbe Weg wie WEAR, wie bei einer Hanger-Garderobe. Der Webserver muss slbot dafür nicht erreichen.
+Oben neben dem Titel sitzt ein Punkt und der Button **Status prüfen**. Ein Klick (und einmal beim Laden der Seite) fragt `api/status.php`. Der Aufruf pingt das Skript im OpenCollar über die registrierte HTTP-in-URL — derselbe Weg wie WEAR, wie bei einer Hanger-Garderobe. Der Webserver muss slbot dafür nicht erreichen. Es gibt kein Intervall; nach WEAR, ADD oder REMOVE kommt höchstens eine einmalige Nachprüfung.
 
 - **grün**, wenn das Collar-Skript innerhalb des Timeouts antwortet (Avatar ist in Second Life); daneben der Regionsname
 - **grau**, wenn keine URL registriert ist, die URL veraltet ist oder das Skript nicht antwortet

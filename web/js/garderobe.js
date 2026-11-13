@@ -16,6 +16,7 @@
   const metaEl = $('#meta');
   const healthEl = $('#health');
   const healthText = $('#health-text');
+  const statusCheck = $('#status-check');
   const stuffToggle = $('#stuff-toggle');
   const stuffPanel = $('#stuff-panel');
   const stuffBackdrop = $('#stuff-backdrop');
@@ -201,7 +202,7 @@
     });
     showLook(false);
     renderStuff();
-    pollHealth();
+    checkStatus();
   }
 
   function setHealth(state, text) {
@@ -209,7 +210,8 @@
     healthText.textContent = text || '';
   }
 
-  async function pollHealth() {
+  async function checkStatus() {
+    if (statusCheck) statusCheck.disabled = true;
     const ctrl = new AbortController();
     const t = setTimeout(() => ctrl.abort(), 12000);
     try {
@@ -234,6 +236,7 @@
       setHealth('down', 'nicht verbunden');
     } finally {
       clearTimeout(t);
+      if (statusCheck) statusCheck.disabled = false;
     }
   }
 
@@ -294,7 +297,7 @@
         paintWearButton();
         renderDots();
         const waitMs = ((j.wait || 5) + 2) * 1000;
-        setTimeout(pollHealth, waitMs);
+        setTimeout(checkStatus, waitMs);
       } else if (o.who === 'layla') {
         setStatus('Das Skript ist gerade nicht verbunden — ich hab Bescheid bekommen und zieh’s selbst an.', 'ok');
       } else {
@@ -330,7 +333,7 @@
         } else {
           wornStuff = wornStuff.filter((n) => String(n).toLowerCase() !== String(folder).toLowerCase());
         }
-        setTimeout(pollHealth, 2500);
+        setTimeout(checkStatus, 2500);
       } else {
         setStatus('Das Skript ist gerade nicht verbunden.', 'err');
       }
@@ -341,6 +344,7 @@
     renderStuff();
   }
 
+  statusCheck.addEventListener('click', () => checkStatus());
+
   if (window.GARDEROBE) openApp(window.GARDEROBE);
-  setInterval(pollHealth, 30000);
 })();

@@ -39,6 +39,7 @@ $payload = json_encode([
           <span class="health-dot" aria-hidden="true"></span>
           <span class="health-text" id="health-text">prüfe …</span>
         </div>
+        <button type="button" class="status-check" id="status-check">Status prüfen</button>
         <button type="button" class="stuff-toggle" id="stuff-toggle" aria-expanded="false" aria-controls="stuff-panel">STUFF</button>
       </div>
 <?php if (count($people) > 1): ?>
