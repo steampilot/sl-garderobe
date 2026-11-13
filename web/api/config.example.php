@@ -40,6 +40,14 @@ return [
             'wear' => true,
         ],
         [
+            'id' => 'bikini',
+            'who' => 'layla',
+            'name' => 'Bikini',
+            'folder' => 'bikini',
+            'desc' => 'Rosa Rüschenbikini (Hut und Tasche liegen in Stuff/beach)',
+            'wear' => true,
+        ],
+        [
             'id' => 'white-negligee',
             'who' => 'layla',
             'name' => 'Weisses Negligé',

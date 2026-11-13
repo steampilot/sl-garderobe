@@ -10,7 +10,7 @@ Kein PIN. Die Seite wird nicht von Suchmaschinen indexiert.
 
 Den Inhalt von `web/` nach `steampilot.ch/garderobe/` legen. Die Datei `web/api/config.example.php` nach `web/api/config.php` kopieren und dort den Token eintragen — derselbe gehört ins LSL-Skript. Den echten Token nicht auf GitHub legen.
 
-Wenn `config.php` schon existiert, die Werte aus dem Example nachziehen: `parent_folder` (`Outfits`), die Ordnernamen (`naked`, `negligee`) und den Western-Eintrag.
+Wenn `config.php` schon existiert, die Werte aus dem Example nachziehen: `parent_folder` (`Outfits`), die Ordnernamen (`naked`, `negligee`) und die Einträge Western und Bikini.
 
 ## 2. Sektionen
 
@@ -18,7 +18,7 @@ Vier Reiter: **Layla**, **Jérôme**, **Cindy**, **Caprica**.
 
 Bilder liegen unter `web/img/<Person>/<SL-Ordner>.webp` oder `.png`, Vorderansicht **832×1248**. Personenordner: `Layla`, `Steampilot`, `Cindy`, `Caprica`. Der Dateiname ist genau der Second-Life-Ordner. Die App findet die Endung selbst; ein abweichender Name kann in `config.php` unter `image` stehen.
 
-- Layla: `default`, `black`, `western` (Bild: `western.png`), `negligee`, `naked`
+- Layla: `default`, `black`, `western` (Bild: `western.png`), `bikini`, `negligee`, `naked`
 - Steampilot (Jérôme): `jacket`, `tshirt`
 
 Cindy- und Caprica-Bilder kommen nach, sobald sie generiert sind — gleicher Pfad, Eintrag in `web/api/config.php` (`folder` = SL-Ordnername, `who` = layla / jerome / cindy / caprica).
@@ -29,12 +29,14 @@ Die Garderobe folgt nicht der Default-OpenCollar-Konvention `.outfits`. Stattdes
 
 - Körperteile (Body, Skin, Shape und zugehörige Config-Prims) liegen in `#RLV/.body(nostrip)/<Unterordner>` und werden von der Garderobe **nie** angefasst.
 - Kleidungs-Outfits liegen als **echte Kopien** (keine Links) in `#RLV/Outfits/<outfitname>` — Namen genau ein Wort, kleingeschrieben.
+- Zubehör (Stuff) liegt in `#RLV/Stuff/<name>` (z. B. `guitar`, `beach` mit Hut und Tasche). Die Garderobe zieht es beim Outfitwechsel nicht aus; ADD/REMOVE dafür kommt später.
 
 Layla:
 
 - `default` (rote Jacke)
 - `black` (schwarze Jacke)
 - `western` (Cowboyhut, kariertes Hemd, Shorts, Stiefel)
+- `bikini` (rosa Rüschenbikini Lisa Ruffle, Legacy)
 - `negligee`
 - `naked`
 
