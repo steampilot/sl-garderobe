@@ -35,7 +35,7 @@ $payload = json_encode([
     <header class="top">
       <div class="top-row">
         <div class="brand">Garderobe</div>
-        <div class="health" id="health" data-state="unknown" title="Client und Verbindung">
+        <div class="health" id="health" data-state="unknown" title="Collar verbunden">
           <span class="health-dot" aria-hidden="true"></span>
           <span class="health-text" id="health-text">prüfe …</span>
         </div>

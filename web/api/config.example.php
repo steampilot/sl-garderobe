@@ -8,9 +8,10 @@ return [
     'mail_from' => 'garderobe@steampilot.ch',
     'parent_folder' => 'Outfits',
     'wait_seconds' => 5,
-    // Vom Webserver erreichbare URL der slbot-Befehlsschnittstelle.
-    // Standard ist localhost; liegt der Bot woanders, hier den Tunnel oder Proxy eintragen.
-    'bot_url' => 'http://127.0.0.1:8765/',
+    // Optional. Health-Check und getragenes Outfit laufen über das Collar-Skript.
+    // bot_url nur setzen, wenn der Webserver den Bot wirklich erreicht — dann
+    // dient outfit-worn als Fallback, falls der Collar-Ping die Flags nicht liefert.
+    // 'bot_url' => 'http://127.0.0.1:8765/',
     'stuff_parent' => 'Stuff',
     // Vorerst nur Layla. Weitere Avatare (jerome, cindy, caprica) später wieder
     // hier eintragen — deren Collar funktioniert anders und wird gerade nicht gebraucht.

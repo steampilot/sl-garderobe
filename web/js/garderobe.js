@@ -221,7 +221,7 @@
       const j = await r.json();
       if (j.green) setHealth('ok', j.text || j.region || 'verbunden');
       else if (j.running && !j.online) setHealth('offline', j.text || 'nicht verbunden');
-      else setHealth('down', j.text || 'Client nicht erreichbar');
+      else setHealth('down', j.text || 'nicht verbunden');
 
       if (j.worn_available) {
         wornOutfits = Array.isArray(j.worn_outfits) ? j.worn_outfits : [];
@@ -231,7 +231,7 @@
         renderStuff();
       }
     } catch {
-      setHealth('down', 'Client nicht erreichbar');
+      setHealth('down', 'nicht verbunden');
     } finally {
       clearTimeout(t);
     }
