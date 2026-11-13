@@ -38,6 +38,7 @@ if ($url !== '') {
         'folder' => $folder,
         'parent' => $parent,
         'wait' => $wait,
+        'op' => 'wear',
         'id' => $id,
         'who' => $who,
     ]);

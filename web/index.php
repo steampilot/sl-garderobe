@@ -4,9 +4,11 @@ require __DIR__ . '/api/inc.php';
 header('X-Robots-Tag: noindex, nofollow, noarchive');
 header('Referrer-Policy: no-referrer');
 header('Cache-Control: no-store');
+$people = public_people($config);
 $payload = json_encode([
-    'people' => public_people($config),
+    'people' => $people,
     'outfits' => public_outfits($config),
+    'stuff' => public_stuff($config),
 ], JSON_UNESCAPED_UNICODE);
 ?><!DOCTYPE html>
 <html lang="de">
@@ -33,13 +35,21 @@ $payload = json_encode([
     <header class="top">
       <div class="top-row">
         <div class="brand">Garderobe</div>
+        <div class="health" id="health" data-state="unknown" title="Client und Verbindung">
+          <span class="health-dot" aria-hidden="true"></span>
+          <span class="health-text" id="health-text">prüfe …</span>
+        </div>
+        <button type="button" class="stuff-toggle" id="stuff-toggle" aria-expanded="false" aria-controls="stuff-panel">STUFF</button>
       </div>
+<?php if (count($people) > 1): ?>
       <div id="who" class="who" role="tablist" aria-label="Wessen Outfits">
-        <button type="button" role="tab" data-who="layla" aria-selected="true">Layla</button>
-        <button type="button" role="tab" data-who="jerome" aria-selected="false">Jérôme</button>
-        <button type="button" role="tab" data-who="cindy" aria-selected="false">Cindy</button>
-        <button type="button" role="tab" data-who="caprica" aria-selected="false">Caprica</button>
+<?php foreach ($people as $i => $p): ?>
+        <button type="button" role="tab" data-who="<?php echo htmlspecialchars($p['id'], ENT_QUOTES); ?>" aria-selected="<?php echo $i === 0 ? 'true' : 'false'; ?>"><?php echo htmlspecialchars($p['name']); ?></button>
+<?php endforeach; ?>
       </div>
+<?php else: ?>
+      <div id="who" class="who" role="tablist" aria-label="Wessen Outfits" hidden></div>
+<?php endif; ?>
     </header>
 
     <div class="stage-wrap" id="stage">
@@ -67,6 +77,15 @@ $payload = json_encode([
       <p id="status" class="status"></p>
     </footer>
   </div>
+
+  <div id="stuff-backdrop" class="stuff-backdrop" hidden></div>
+  <aside id="stuff-panel" class="stuff-panel" hidden>
+    <div class="stuff-head">
+      <h2>Stuff</h2>
+      <button type="button" class="stuff-close" id="stuff-close" aria-label="Schliessen">×</button>
+    </div>
+    <ul id="stuff-list" class="stuff-list"></ul>
+  </aside>
 
   <script>window.GARDEROBE = <?php echo $payload; ?>;</script>
   <script src="js/garderobe.js"></script>

@@ -1,17 +1,21 @@
 <?php
 // Garderobe-Config. Nicht per Web erreichbar (siehe .htaccess).
 // Token muss mit dem im LSL-Skript übereinstimmen.
+// Echte Datei: diese Vorlage nach config.php kopieren (nicht ins Git).
 return [
     'token' => 'PASTE_YOUR_TOKEN',
     'notify_email' => 'layla.strange+garderobe@mail.grokbot.com',
     'mail_from' => 'garderobe@steampilot.ch',
     'parent_folder' => 'Outfits',
     'wait_seconds' => 5,
+    // Vom Webserver erreichbare URL der slbot-Befehlsschnittstelle.
+    // Standard ist localhost; liegt der Bot woanders, hier den Tunnel oder Proxy eintragen.
+    'bot_url' => 'http://127.0.0.1:8765/',
+    'stuff_parent' => 'Stuff',
+    // Vorerst nur Layla. Weitere Avatare (jerome, cindy, caprica) später wieder
+    // hier eintragen — deren Collar funktioniert anders und wird gerade nicht gebraucht.
     'people' => [
-        ['id' => 'layla',   'name' => 'Layla',      'img' => 'Layla'],
-        ['id' => 'jerome',  'name' => 'Jérôme',     'img' => 'Steampilot'],
-        ['id' => 'cindy',   'name' => 'Cindy',      'img' => 'Cindy'],
-        ['id' => 'caprica', 'name' => 'Caprica',    'img' => 'Caprica'],
+        ['id' => 'layla', 'name' => 'Layla', 'img' => 'Layla'],
     ],
     'outfits' => [
         [
@@ -63,24 +67,25 @@ return [
             'desc' => 'Ohne Kleidung, Chain heart bleibt',
             'wear' => true,
         ],
-        [
-            'id' => 'saint-celestine',
-            'who' => 'jerome',
-            'name' => 'Saint Celestine',
-            'folder' => 'jacket',
-            'desc' => 'Braune Fliegerjacke, dunkles Hemd, blaue Jeans',
-            'wear' => true,
-        ],
-        [
-            'id' => 'caprica-shirt',
-            'who' => 'jerome',
-            'name' => 'Caprica Shirt',
-            'folder' => 'tshirt',
-            'desc' => 'Schwarzes Bandshirt mit Caprica-Motiv',
-            'wear' => true,
-        ],
-        // Cindy- und Caprica-Looks kommen dazu, sobald die Bilder generiert sind.
+        // Weitere Personen später so ergänzen:
+        // ['id' => 'saint-celestine', 'who' => 'jerome', 'name' => 'Saint Celestine', 'folder' => 'jacket', 'desc' => '…', 'wear' => true],
         // Format: Vorderansicht, 832×1248, Datei web/img/<Person>/<SL-Ordner>.webp oder .png
-        // Personenordner: Layla, Steampilot, Cindy, Caprica. Dateiname = SL-Ordner (default, black, western, …).
+        // Personenordner: Layla (weitere: Steampilot, Cindy, Caprica).
+    ],
+    // Zubehör unter #RLV/Stuff/<folder>. ADD hängt den Ordner zusätzlich an,
+    // REMOVE zieht nur diesen Ordner aus — das Outfit bleibt.
+    'stuff' => [
+        [
+            'id' => 'guitar',
+            'name' => 'Gitarre',
+            'folder' => 'guitar',
+            'desc' => 'Gitarre',
+        ],
+        [
+            'id' => 'beach',
+            'name' => 'Strand',
+            'folder' => 'beach',
+            'desc' => 'Hut und Handtasche',
+        ],
     ],
 ];

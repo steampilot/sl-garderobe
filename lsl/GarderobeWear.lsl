@@ -2,18 +2,21 @@
 // Einfach in den Inhalt des OpenCollars legen (Root-Prim) und das Halsband tragen.
 // Kein extra Prim, den Namen des Halsbands nicht ändern.
 //
-// Dasselbe Skript funktioniert auf Layla, Jérôme (Steampilot Mysterious),
-// Cindy Mysterious und Caprica Mysterious: es erkennt den Besitzer selbst
-// und registriert sich unter der richtigen Sektion. WHO nur setzen,
-// falls die automatische Erkennung nicht greift: "layla", "jerome",
-// "cindy" oder "caprica".
+// Die Website zeigt vorerst nur Layla. Das Skript erkennt den Besitzer
+// weiterhin selbst (layla / jerome / cindy / caprica), falls später
+// weitere Sektionen wieder dazukommen. WHO nur setzen, falls die
+// automatische Erkennung nicht greift.
 //
-// Bei WEAR auf der Website:
+// Bei WEAR auf der Website (op=wear, Standard):
 //   1. @detachall:Outfits=force
 //   2. fünf Sekunden warten
 //   3. @attachallover:Outfits/<Foldername>=force
 //
-// Nur der Ordner "Outfits" unter #RLV wird angefasst.
+// Bei STUFF (op=add / op=remove), ohne das Outfit zu ersetzen:
+//   add:    @attachallover:Stuff/<Foldername>=force
+//   remove: @detachall:Stuff/<Foldername>=force
+//
+// Nur die genannten Ordner unter #RLV werden angefasst.
 // Körperteile liegen in #RLV/.body(nostrip)/ und bleiben unberührt.
 // Niemals @detachall ohne Ordner — sonst fielen Halsband und Collar.
 
@@ -132,6 +135,7 @@ default
         string token;
         string folder;
         string parent = PARENT;
+        string op = "wear";
         float wait = WAIT;
 
         list parts = llParseString2List(body, ["&"], []);
@@ -148,6 +152,7 @@ default
                 if (k == "folder") folder = v;
                 if (k == "parent") parent = v;
                 if (k == "wait")   wait   = (float)v;
+                if (k == "op")     op     = llToLower(v);
             }
         }
 
@@ -164,11 +169,27 @@ default
             llHTTPResponse(id, 400, "{\"ok\":false,\"error\":\"folder\"}");
             return;
         }
+        if (op != "add" && op != "remove") op = "wear";
         if (wait < 3.0) wait = 3.0;
         if (wait > 15.0) wait = 15.0;
 
         // Antwort sofort, dann erst der Wechsel — sonst läuft der HTTP-Timeout in die Wartezeit.
         llHTTPResponse(id, 200, "{\"ok\":true,\"folder\":\"" + folder + "\"}");
+
+        if (op == "add")
+        {
+            // Nur diesen Stuff-Ordner zusätzlich anziehen, Outfit bleibt.
+            llOwnerSay("@attachallover:" + parent + "/" + folder + "=force");
+            llOwnerSay("Garderobe: " + parent + "/" + folder + " angezogen.");
+            return;
+        }
+        if (op == "remove")
+        {
+            // Nur diesen Stuff-Ordner ausziehen, niemals @detachall ohne Pfad.
+            llOwnerSay("@detachall:" + parent + "/" + folder + "=force");
+            llOwnerSay("Garderobe: " + parent + "/" + folder + " ausgezogen.");
+            return;
+        }
 
         gPending = parent + "/" + folder;
         gBusy = TRUE;
