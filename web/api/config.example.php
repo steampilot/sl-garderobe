@@ -5,7 +5,7 @@ return [
     'token' => 'PASTE_YOUR_TOKEN',
     'notify_email' => 'layla.strange+garderobe@mail.grokbot.com',
     'mail_from' => 'garderobe@steampilot.ch',
-    'parent_folder' => '.outfits',
+    'parent_folder' => 'Outfits',
     'wait_seconds' => 5,
     'people' => [
         ['id' => 'layla',   'name' => 'Layla',      'img' => 'Layla'],

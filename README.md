@@ -10,7 +10,7 @@ Kein PIN. Die Seite wird nicht von Suchmaschinen indexiert.
 
 Den Inhalt von `web/` nach `steampilot.ch/garderobe/` legen. Die Datei `web/api/config.example.php` nach `web/api/config.php` kopieren und dort den Token eintragen — derselbe gehört ins LSL-Skript. Den echten Token nicht auf GitHub legen.
 
-Wenn `config.php` schon existiert, die Werte aus dem Example nachziehen: `parent_folder`, die Ordnernamen (`naked`, `negligee`) und den neuen Western-Eintrag. Die Website erst auf den Server legen, **nachdem** das neue Skript im OpenCollar liegt — sonst würde das alte Skript `@detachall:.outfits=force` senden und `.core` (Body, Skin, Shape) mit ausziehen.
+Wenn `config.php` schon existiert, die Werte aus dem Example nachziehen: `parent_folder` (`Outfits`), die Ordnernamen (`naked`, `negligee`) und den Western-Eintrag.
 
 ## 2. Sektionen
 
@@ -25,7 +25,10 @@ Cindy- und Caprica-Bilder kommen nach, sobald sie generiert sind — gleicher Pf
 
 ## 3. Ordner in Second Life
 
-OpenCollar-Konvention: Jeder Avatar hat unter `#RLV` den Ordner `.outfits`. Darin liegen die Kleidungs-Outfits als **echte Kopien** (keine Links) — Namen genau ein Wort, kleingeschrieben. Body, Skin und Shape liegen in `#RLV/.outfits/.core` und werden von der Garderobe **nie** angefasst.
+Die Garderobe folgt nicht der Default-OpenCollar-Konvention `.outfits`. Stattdessen:
+
+- Körperteile (Body, Skin, Shape und zugehörige Config-Prims) liegen in `#RLV/.body(nostrip)/<Unterordner>` und werden von der Garderobe **nie** angefasst.
+- Kleidungs-Outfits liegen als **echte Kopien** (keine Links) in `#RLV/Outfits/<outfitname>` — Namen genau ein Wort, kleingeschrieben.
 
 Layla:
 
@@ -40,15 +43,15 @@ Jérôme (Steampilot Mysterious):
 - `jacket` (Saint Celestine)
 - `tshirt` (Caprica Shirt)
 
-Also z. B. `#RLV/.outfits/default`, `#RLV/.outfits/western`. Das OpenCollar und das Chain-heart-Halsband kommen **nicht** in diese Ordner und werden nicht ausgezogen. Das Skript macht nur:
+Also z. B. `#RLV/Outfits/default`, `#RLV/Outfits/western`. Das OpenCollar und das Chain-heart-Halsband kommen **nicht** in diese Ordner und werden nicht ausgezogen. Das Skript macht nur:
 
-1. Für jeden konfigurierten Kleidungs-Ordner **ausser** `.core`: `@detachall:.outfits/<Ordner>=force`
+1. `@detachall:Outfits=force`
 2. fünf Sekunden warten
-3. `@attachallover:.outfits/<Foldername>=force`
+3. `@attachallover:Outfits/<Foldername>=force`
 
-Niemals `@detachall` ohne Pfad, niemals `@detachall:.outfits=force` — das würde `.core` mit ausziehen.
+Niemals `@detachall` ohne Pfad — sonst fielen Halsband und Collar. Weil `.body(nostrip)` ausserhalb von `Outfits` liegt, bleibt der Körper dabei an.
 
-Die Ordnernamen kannst du in `web/api/config.php` (`folder`) anpassen, falls sie bei dir anders heissen. OpenCollar steuert dieselben Ordner ingame.
+Die Ordnernamen kannst du in `web/api/config.php` (`folder`) anpassen, falls sie bei dir anders heissen.
 
 ## 4. Skript ins OpenCollar
 

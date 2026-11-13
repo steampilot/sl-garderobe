@@ -114,19 +114,6 @@ function public_outfits(array $config): array {
     return $out;
 }
 
-// Kleidungs-Ordner eines Avatars zum Ausziehen. Nie .core oder andere Punkt-Ordner.
-function clothing_folders(array $config, string $who): array {
-    $folders = [];
-    foreach ($config['outfits'] as $o) {
-        if ((string)$o['who'] !== $who) continue;
-        $f = (string)$o['folder'];
-        if ($f === '' || $f[0] === '.') continue;
-        if (strtolower($f) === 'core') continue;
-        if (!in_array($f, $folders, true)) $folders[] = $f;
-    }
-    return $folders;
-}
-
 function lsl_url(?string $who = null): string {
     if ($who) {
         $f = data_path('lsl_url_' . $who . '.txt');
