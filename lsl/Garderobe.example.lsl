@@ -34,7 +34,6 @@ string  gUrl;
 string  gPending;
 integer gBusy;
 
-// Ping / @getinvworn auf privaten Channels (wie eine Hanger-Garderobe).
 integer CH_INV_OUTFITS;
 integer CH_WORN_OUTFITS;
 integer CH_INV_STUFF;
@@ -55,21 +54,6 @@ string detectWho()
     if (llSubStringIndex(n, "steampilot") != -1) return "jerome";
     if (llSubStringIndex(n, "layla") != -1) return "layla";
     return "";
-}
-
-string safeName(string s)
-{
-    // keine RLV-Metazeichen, keine Pfadwanderung
-    integer i;
-    string out;
-    for (i = 0; i < llStringLength(s); i += 1)
-    {
-        string c = llGetSubString(s, i, i);
-        if (c != "/" && c != ":" && c != "=" && c != "," && c != "&"
-            && c != "@" && c != "\"" && c != "\\" && c != "\n" && c != "\r")
-            out += c;
-    }
-    return out;
 }
 
 integer chanBase()
@@ -155,7 +139,7 @@ string jsonEscape(string s)
     {
         string c = llGetSubString(s, i, i);
         if (c == "\\" || c == "\"") out += "\\";
-        if (c != "\n" && c != "\r") out += c;
+        if (c != "\n") out += c;
     }
     return out;
 }

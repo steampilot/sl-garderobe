@@ -2,6 +2,8 @@
 web/api/config.php
 web/data/*.txt
 web/data/*.log
+lsl/Garderobe.lsl
 .secrets-local
 shots/
 *.zip
+*.local.*
