@@ -40,7 +40,6 @@ return [
             'who' => 'layla',
             'name' => 'Western',
             'folder' => 'western',
-            'image' => 'western.png',
             'desc' => 'Blauer Cowboyhut, kariertes Hemd, Jeans-Shorts, blaue Stiefel',
             'wear' => true,
         ],
@@ -58,6 +57,14 @@ return [
             'name' => 'Bikini',
             'folder' => 'bikini',
             'desc' => 'Rosa Rüschenbikini (Hut und Tasche liegen in Stuff/beach)',
+            'wear' => true,
+        ],
+        [
+            'id' => 'stripper',
+            'who' => 'layla',
+            'name' => 'Stripper',
+            'folder' => 'stripper',
+            'desc' => 'Schwarzer Latex Skirt und Rüschen Top',
             'wear' => true,
         ],
         [
