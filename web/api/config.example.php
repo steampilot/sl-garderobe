@@ -28,11 +28,19 @@ return [
             'wear' => true,
         ],
         [
-            'id' => 'spicy-black',
+            'id' => 'black',
             'who' => 'layla',
             'name' => 'Spicy Black',
             'folder' => 'black',
             'desc' => 'Schwarze Lederjacke, rotes Top, schwarzer Rock',
+            'wear' => true,
+        ],
+        [
+            'id' => 'winter',
+            'who' => 'layla',
+            'name' => 'Winter',
+            'folder' => 'winter',
+            'desc' => 'Nordic snowflake Pullover, handschuhe, mini Rock, kniehohe Socken, winter beanie',
             'wear' => true,
         ],
         [
@@ -109,6 +117,12 @@ return [
             'name' => 'Strand',
             'folder' => 'beach',
             'desc' => 'Hut und Handtasche',
+        ],
+        [
+            'id' => 'panty',
+            'name' => 'Panty',
+            'folder' => 'panty',
+            'desc' => 'Unterwäsche',
         ],
     ],
 ];
