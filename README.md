@@ -54,7 +54,7 @@ Die Ordnernamen kannst du in `web/api/config.php` (`folder`) anpassen, falls sie
 
 ## 4. Skript ins OpenCollar
 
-Kein extra Prim. Dasselbe Skript `lsl/GarderobeWear.lsl` kommt in den Inhalt des OpenCollars (Root-Prim) und bleibt dort — den Namen des Halsbands nicht ändern. Die Website spricht nur Layla an; das Skript erkennt den Besitzer trotzdem selbst, falls später weitere Sektionen dazukommen.
+Kein extra Prim. Dasselbe Skript `lsl/Garderobe.example.lsl` kommt in den Inhalt des OpenCollars (Root-Prim) und bleibt dort — den Namen des Halsbands nicht ändern. Die Website spricht nur Layla an; das Skript erkennt den Besitzer trotzdem selbst, falls später weitere Sektionen dazukommen.
 
 1. Token und Website-URL sind im Skript schon eingetragen (bzw. den Token aus `config.php` einsetzen, wenn du vom Repo-Platzhalter kommst).
 2. OpenCollar tragen, bearbeiten, das Skript in den Inhalt legen (nach einem Update des Skripts das neue hineinlegen).
@@ -68,9 +68,11 @@ Wenn die Erkennung nicht greift, oben im Skript `WHO` auf `"layla"` setzen.
 
 Der Button spricht das Skript im OpenCollar an **und** schickt mir eine Nachricht (`layla.strange+garderobe@mail.grokbot.com`). Bei mir (Layla) ziehe ich das Outfit selbst an, wenn das Skript gerade nicht verbunden ist.
 
-Links oben öffnet **TP** ein Panel von der linken Seite. Jede Zeile zeigt den Ortsnamen und einen **GO**-Knopf. Die Orte stehen in `config.php` unter `teleports` — pro Eintrag nur `name` und `url` (eine SLurl wie `https://maps.secondlife.com/secondlife/Mesa%20Island/197/161/3003` oder `secondlife://Region/x/y/z`). Der Server liest Region und Koordinaten aus der URL. Golden Dawn und Haven Woods sind serverseitig gesperrt (`blocked_regions`, zusätzlich fest im Code). `todo => true` markiert einen noch unbestätigten Ort (aktuell The Beach = Wild Breeze in Andromede).
+Oben in der Kopfzeile gibt es ausserdem **Sit** und **Unsit**, unabhängig vom Teleport. Sit arbeitet wie der Collar-Befehl `layla sit` und nimmt automatisch das erste Objekt der Sensor-Liste (nächstes Möbel im Umkreis von 20 m). Unsit entspricht `layla unsit`. Beide rufen `api/sit.php` auf.
 
-GO ruft `api/tp.php` auf, das denselben Token-Weg wie WEAR benutzt und dem Garderobe-Skript `op=tp` schickt. Das Skript macht `@tpto:<Region>/<x>/<y>/<z>=force`. Dafür muss das aktualisierte `lsl/GarderobeWear.lsl` im OpenCollar liegen, und RLV `@tpto` darf nicht gesperrt sein.
+Links oben öffnet **TP** ein Panel von der linken Seite (STUFF bleibt rechts). Jede Zeile zeigt den Ortsnamen und einen **GO**-Knopf. Die Orte stehen in `config.php` unter `teleports` — pro Eintrag nur `name` und `url` (eine SLurl wie `https://maps.secondlife.com/secondlife/Mesa%20Island/197/161/3003` oder `secondlife://Region/x/y/z`). Der Server liest Region und Koordinaten aus der URL. Golden Dawn und Haven Woods sind serverseitig gesperrt (`blocked_regions`, zusätzlich fest im Code). `todo => true` markiert einen noch unbestätigten Ort (aktuell The Beach = Wild Breeze in Andromede).
+
+GO ruft `api/tp.php` auf, das denselben Token-Weg wie WEAR benutzt und dem Garderobe-Skript `op=tp` schickt. Das Skript macht `@tpto:<Region>/<x>/<y>/<z>=force`. Sit und Unsit gehen als `op=sit` / `op=unsit` an dasselbe Skript. Dafür muss das aktualisierte `lsl/Garderobe.example.lsl` (die neuen `op=`-Teile) in das Live-Collar-Skript übernommen werden. RLV `@tpto`, `@sit` und `@unsit` dürfen nicht gesperrt sein.
 
 ## 6. Statuslicht und aktuelles Outfit
 
@@ -110,4 +112,4 @@ Diese Schlüssel in die Live-`config.php` legen (Token und Mail-Adressen nicht �
     ],
 ```
 
-Die Layla-Outfits bleiben wie bisher; nur Jérôme-, Cindy- und Caprica-Einträge streichen. Ausserdem das aktualisierte `lsl/GarderobeWear.lsl` ins OpenCollar legen — ohne das neue Skript bleiben Statuslicht und die Erkennung des Outfits grau, und STUFF-ADD/REMOVE fehlen.
+Die Layla-Outfits bleiben wie bisher; nur Jérôme-, Cindy- und Caprica-Einträge streichen. Ausserdem das aktualisierte `lsl/Garderobe.example.lsl` ins OpenCollar legen — ohne das neue Skript bleiben Statuslicht und die Erkennung des Outfits grau, und STUFF-ADD/REMOVE fehlen.

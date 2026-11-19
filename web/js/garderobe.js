@@ -17,6 +17,8 @@
   const healthEl = $('#health');
   const healthText = $('#health-text');
   const statusCheck = $('#status-check');
+  const sitBtn = $('#sit-btn');
+  const unsitBtn = $('#unsit-btn');
   const stuffToggle = $('#stuff-toggle');
   const stuffPanel = $('#stuff-panel');
   const stuffBackdrop = $('#stuff-backdrop');
@@ -449,6 +451,42 @@
     renderStuff();
   }
 
+  async function sitAction(action) {
+    if (busy) return;
+    busy = true;
+    if (sitBtn) sitBtn.disabled = true;
+    if (unsitBtn) unsitBtn.disabled = true;
+    renderStuff();
+    renderTeleports();
+    setStatus(action === 'unsit' ? 'stehe auf …' : 'setze mich …');
+    try {
+      const r = await fetch('api/sit.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify({ action }),
+      });
+      const j = await r.json();
+      if (!j.ok) {
+        setStatus(j.error || 'Hat nicht geklappt', 'err');
+      } else if (j.lsl) {
+        setStatus(action === 'unsit' ? 'Ich stehe auf.' : 'Ich setze mich aufs erste Objekt in der Nähe.', 'ok');
+        setTimeout(checkStatus, 2500);
+      } else {
+        setStatus('Das Skript ist gerade nicht verbunden.', 'err');
+      }
+    } catch {
+      setStatus('Verbindung hat nicht geklappt', 'err');
+    }
+    busy = false;
+    if (sitBtn) sitBtn.disabled = false;
+    if (unsitBtn) unsitBtn.disabled = false;
+    renderStuff();
+    renderTeleports();
+  }
+
+  if (sitBtn) sitBtn.addEventListener('click', () => sitAction('sit'));
+  if (unsitBtn) unsitBtn.addEventListener('click', () => sitAction('unsit'));
   statusCheck.addEventListener('click', () => checkStatus());
 
   if (window.GARDEROBE) openApp(window.GARDEROBE);

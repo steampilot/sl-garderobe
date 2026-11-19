@@ -385,7 +385,8 @@ body {
 /* ----- status check + stuff toggle / drawer ----- */
 .status-check,
 .stuff-toggle,
-.tp-toggle {
+.tp-toggle,
+.sit-btn {
   appearance: none;
   flex: 0 0 auto;
   border: 1px solid var(--line);
@@ -406,17 +407,21 @@ body {
 .status-check { margin-left: auto; letter-spacing: 0.08em; }
 .stuff-toggle { margin-left: 0.4rem; letter-spacing: 0.18em; }
 .tp-toggle { margin-right: 0.45rem; letter-spacing: 0.18em; }
+.sit-btn { margin-left: 0.4rem; letter-spacing: 0.14em; }
 .status-check:active,
 .stuff-toggle[aria-expanded="true"],
 .stuff-toggle:active,
 .tp-toggle[aria-expanded="true"],
-.tp-toggle:active {
+.tp-toggle:active,
+.sit-btn:active {
   background: rgba(243, 239, 232, 0.18);
 }
-.status-check:disabled { opacity: 0.55; cursor: default; }
+.status-check:disabled,
+.sit-btn:disabled { opacity: 0.55; cursor: default; }
 .status-check:focus-visible,
 .stuff-toggle:focus-visible,
-.tp-toggle:focus-visible { outline: 2px solid var(--red); outline-offset: 3px; }
+.tp-toggle:focus-visible,
+.sit-btn:focus-visible { outline: 2px solid var(--red); outline-offset: 3px; }
 
 body.stuff-open,
 body.tp-open { overflow: hidden; }

@@ -23,6 +23,11 @@
 // Bei TP (op=tp): @tpto:<Region>/<x>/<y>/<z>=force
 //   Golden Dawn und Haven Woods werden abgelehnt.
 //
+// Bei SIT (op=sit): wie «layla sit», nimmt das erste Objekt der
+//   Sensor-Liste (20 m, SCRIPTED|PASSIVE, nächstes zuerst) und
+//   schickt dem OpenCollar llMessageLinked(CMD_OWNER, "sit <uuid>").
+// Bei UNSIT (op=unsit): wie «layla unsit» (CMD_OWNER "unsit").
+//
 // Nur die genannten Ordner unter #RLV werden angefasst.
 // Körperteile liegen in #RLV/.body(nostrip)/ und bleiben unberührt.
 // Niemals @detachall ohne Ordner — sonst fielen Halsband und Collar.
@@ -32,6 +37,7 @@ string  TOKEN  = "PASTE_YOUR_TOKEN";
 string  PARENT = "Outfits";   // #RLV/Outfits/<Foldername>
 float   WAIT   = 5.0;
 string  WHO    = "";          // leer = automatisch nach Besitzername
+integer CMD_OWNER = 500;      // OpenCollar: Owner-Befehl, wie Chat «layla sit»
 
 string  gUrl;
 string  gPending;
@@ -57,6 +63,28 @@ string detectWho()
     if (llSubStringIndex(n, "steampilot") != -1) return "jerome";
     if (llSubStringIndex(n, "layla") != -1) return "layla";
     return "";
+}
+
+string safeName(string s)
+{
+    // keine RLV-Metazeichen, keine Pfadwanderung
+    integer i;
+    string out;
+    for (i = 0; i < llStringLength(s); i += 1)
+    {
+        string c = llGetSubString(s, i, i);
+        if (c != "/" && c != ":" && c != "=" && c != "," && c != "&"
+            && c != "@" && c != "\"" && c != "\\" && c != "\n" && c != "\r")
+            out += c;
+    }
+    return out;
+}
+
+startSitScan()
+{
+    // Gleicher Scan wie OpenCollar MenuForceSit / DIALOG_SENSOR.
+    llOwnerSay("Garderobe: suche Sitzplatz (wie layla sit) …");
+    llSensor("", NULL_KEY, SCRIPTED | PASSIVE, 20.0, PI);
 }
 
 integer chanBase()
@@ -379,6 +407,25 @@ default
             return;
         }
 
+        if (op == "sit" || op == "unsit")
+        {
+            if (gPingWait)
+            {
+                finishPing();
+                llSetTimerEvent(0.0);
+            }
+            if (op == "unsit")
+            {
+                llHTTPResponse(id, 200, "{\"ok\":true,\"op\":\"unsit\"}");
+                llMessageLinked(LINK_SET, CMD_OWNER, "unsit", llGetOwner());
+                llOwnerSay("Garderobe: unsit (wie layla unsit).");
+                return;
+            }
+            llHTTPResponse(id, 200, "{\"ok\":true,\"op\":\"sit\"}");
+            startSitScan();
+            return;
+        }
+
         folder = safeName(folder);
         parent = safeName(parent);
         if (folder == "" || parent == "")
@@ -423,6 +470,21 @@ default
         llOwnerSay("@detachall:" + parent + "=force");
         llOwnerSay("Garderobe: ziehe " + parent + " aus, ziehe " + folder + " in " + (string)((integer)wait) + " Sekunden an.");
         llSetTimerEvent(wait);
+    }
+
+    sensor(integer n)
+    {
+        // llSensor liefert nach Distanz, das erste ist das erste in der Collar-Sit-Liste.
+        if (n < 1) return;
+        key obj = llDetectedKey(0);
+        string nm = llDetectedName(0);
+        llMessageLinked(LINK_SET, CMD_OWNER, "sit " + (string)obj, llGetOwner());
+        llOwnerSay("Garderobe: sitze auf " + nm + " (erstes Objekt, wie layla sit).");
+    }
+
+    no_sensor()
+    {
+        llOwnerSay("Garderobe: nichts zum Sitzen in 20 m gefunden.");
     }
 
     timer()
