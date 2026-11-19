@@ -65,21 +65,6 @@ string detectWho()
     return "";
 }
 
-string safeName(string s)
-{
-    // keine RLV-Metazeichen, keine Pfadwanderung
-    integer i;
-    string out;
-    for (i = 0; i < llStringLength(s); i += 1)
-    {
-        string c = llGetSubString(s, i, i);
-        if (c != "/" && c != ":" && c != "=" && c != "," && c != "&"
-            && c != "@" && c != "\"" && c != "\\" && c != "\n")
-            out += c;
-    }
-    return out;
-}
-
 startSitScan()
 {
     // Gleicher Scan wie OpenCollar MenuForceSit / DIALOG_SENSOR.
@@ -386,7 +371,7 @@ default
                 finishPing();
                 llSetTimerEvent(0.0);
             }
-            region = llStringTrim(safeName(region), STRING_TRIM);
+            region = llStringTrim(region, STRING_TRIM);
             string rlow = llToLower(region);
             if (region == "" || rlow == "golden dawn" || rlow == "haven woods")
             {
@@ -426,8 +411,8 @@ default
             return;
         }
 
-        folder = safeName(folder);
-        parent = safeName(parent);
+        folder = folder;
+        parent = parent;
         if (folder == "" || parent == "")
         {
             llHTTPResponse(id, 400, "{\"ok\":false,\"error\":\"folder\"}");
