@@ -384,7 +384,8 @@ body {
 
 /* ----- status check + stuff toggle / drawer ----- */
 .status-check,
-.stuff-toggle {
+.stuff-toggle,
+.tp-toggle {
   appearance: none;
   flex: 0 0 auto;
   border: 1px solid var(--line);
@@ -404,16 +405,21 @@ body {
 }
 .status-check { margin-left: auto; letter-spacing: 0.08em; }
 .stuff-toggle { margin-left: 0.4rem; letter-spacing: 0.18em; }
+.tp-toggle { margin-right: 0.45rem; letter-spacing: 0.18em; }
 .status-check:active,
 .stuff-toggle[aria-expanded="true"],
-.stuff-toggle:active {
+.stuff-toggle:active,
+.tp-toggle[aria-expanded="true"],
+.tp-toggle:active {
   background: rgba(243, 239, 232, 0.18);
 }
 .status-check:disabled { opacity: 0.55; cursor: default; }
 .status-check:focus-visible,
-.stuff-toggle:focus-visible { outline: 2px solid var(--red); outline-offset: 3px; }
+.stuff-toggle:focus-visible,
+.tp-toggle:focus-visible { outline: 2px solid var(--red); outline-offset: 3px; }
 
-body.stuff-open { overflow: hidden; }
+body.stuff-open,
+body.tp-open { overflow: hidden; }
 
 .stuff-backdrop {
   position: fixed;
@@ -536,3 +542,40 @@ body.stuff-open { overflow: hidden; }
 .dots button.worn {
   background: var(--green);
 }
+
+/* ----- teleport drawer (from the left, mirror of STUFF) ----- */
+.tp-panel {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: min(22rem, 88vw);
+  background: #1c1c1e;
+  border-right: 1px solid var(--line);
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  padding: calc(0.8rem + var(--safe-t)) 0.9rem calc(0.9rem + var(--safe-b)) calc(0.9rem + var(--safe-l));
+  overflow: auto;
+  box-shadow: 12px 0 30px rgba(0, 0, 0, 0.35);
+}
+
+.tp-item {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+}
+.tp-item .stuff-info { flex: 1 1 auto; min-width: 0; }
+.tp-item .stuff-actions { flex: 0 0 auto; }
+.tp-item .stuff-actions button { flex: 0 0 auto; min-width: 4.4rem; }
+.tp-todo {
+  color: var(--muted);
+  font-size: 0.78rem;
+  margin-top: 0.15rem;
+  font-style: italic;
+}
+.tp-go { background: var(--red); }
+.tp-go:hover { background: var(--red-hover); }
+.tp-go:active { background: var(--red-press); }
+

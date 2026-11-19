@@ -9,6 +9,7 @@ $payload = json_encode([
     'people' => $people,
     'outfits' => public_outfits($config),
     'stuff' => public_stuff($config),
+    'teleports' => public_teleports($config),
 ], JSON_UNESCAPED_UNICODE);
 ?><!DOCTYPE html>
 <html lang="de">
@@ -34,6 +35,7 @@ $payload = json_encode([
   <div id="app">
     <header class="top">
       <div class="top-row">
+        <button type="button" class="tp-toggle" id="tp-toggle" aria-expanded="false" aria-controls="tp-panel">TP</button>
         <div class="brand">Garderobe</div>
         <div class="health" id="health" data-state="unknown" title="Collar verbunden">
           <span class="health-dot" aria-hidden="true"></span>
@@ -80,6 +82,14 @@ $payload = json_encode([
   </div>
 
   <div id="stuff-backdrop" class="stuff-backdrop" hidden></div>
+  <aside id="tp-panel" class="tp-panel" hidden>
+    <div class="stuff-head">
+      <h2>Teleport</h2>
+      <button type="button" class="stuff-close" id="tp-close" aria-label="Schliessen">×</button>
+    </div>
+    <ul id="tp-list" class="stuff-list"></ul>
+  </aside>
+
   <aside id="stuff-panel" class="stuff-panel" hidden>
     <div class="stuff-head">
       <h2>Stuff</h2>

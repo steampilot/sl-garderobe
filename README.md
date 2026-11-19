@@ -1,6 +1,6 @@
 # Garderobe
 
-Kleine Website: Outfits durchblättern, unten WEAR. Mobil zuerst, im Handy-Browser als App nutzbar (Safari oder Chrome: „Zum Home-Bildschirm“). Oben ein Statuslicht, daneben das ausklappbare Menü **STUFF**.
+Kleine Website: Outfits durchblättern, unten WEAR. Mobil zuerst, im Handy-Browser als App nutzbar (Safari oder Chrome: „Zum Home-Bildschirm“). Oben ein Statuslicht, links das Teleport-Menü **TP**, rechts das ausklappbare Menü **STUFF**.
 
 Live: https://www.steampilot.ch/garderobe/
 
@@ -10,7 +10,7 @@ Kein PIN. Die Seite wird nicht von Suchmaschinen indexiert.
 
 Den Inhalt von `web/` nach `steampilot.ch/garderobe/` legen. Die Datei `web/api/config.example.php` nach `web/api/config.php` kopieren und dort den Token eintragen — derselbe gehört ins LSL-Skript. Den echten Token nicht auf GitHub legen.
 
-Wenn `config.php` schon existiert, die Werte aus dem Example nachziehen: `parent_folder` (`Outfits`), `stuff_parent`, die Stuff-Einträge und nur noch Layla unter `people` / `outfits`. `bot_url` ist optional und nicht nötig.
+Wenn `config.php` schon existiert, die Werte aus dem Example nachziehen: `parent_folder` (`Outfits`), `stuff_parent`, die Stuff-Einträge, `teleports` (Name + SLurl), `blocked_regions` und nur noch Layla unter `people` / `outfits`. `bot_url` ist optional und nicht nötig.
 
 ## 2. Sektionen
 
@@ -64,13 +64,17 @@ Nach Teleport oder Regions-Neustart holt sich das Skript eine neue URL und regis
 
 Wenn die Erkennung nicht greift, oben im Skript `WHO` auf `"layla"` setzen.
 
-## 5. Was WEAR und STUFF auslösen
+## 5. Was WEAR, STUFF und TP auslösen
 
 Der Button spricht das Skript im OpenCollar an **und** schickt mir eine Nachricht (`layla.strange+garderobe@mail.grokbot.com`). Bei mir (Layla) ziehe ich das Outfit selbst an, wenn das Skript gerade nicht verbunden ist.
 
+Links oben öffnet **TP** ein Panel von der linken Seite. Jede Zeile zeigt den Ortsnamen und einen **GO**-Knopf. Die Orte stehen in `config.php` unter `teleports` — pro Eintrag nur `name` und `url` (eine SLurl wie `https://maps.secondlife.com/secondlife/Mesa%20Island/197/161/3003` oder `secondlife://Region/x/y/z`). Der Server liest Region und Koordinaten aus der URL. Golden Dawn und Haven Woods sind serverseitig gesperrt (`blocked_regions`, zusätzlich fest im Code). `todo => true` markiert einen noch unbestätigten Ort (aktuell The Beach = Wild Breeze in Andromede).
+
+GO ruft `api/tp.php` auf, das denselben Token-Weg wie WEAR benutzt und dem Garderobe-Skript `op=tp` schickt. Das Skript macht `@tpto:<Region>/<x>/<y>/<z>=force`. Dafür muss das aktualisierte `lsl/GarderobeWear.lsl` im OpenCollar liegen, und RLV `@tpto` darf nicht gesperrt sein.
+
 ## 6. Statuslicht und aktuelles Outfit
 
-Oben neben dem Titel sitzt ein Punkt und der Button **Status prüfen**. Ein Klick (und einmal beim Laden der Seite) fragt `api/status.php`. Der Aufruf pingt das Skript im OpenCollar über die registrierte HTTP-in-URL — derselbe Weg wie WEAR, wie bei einer Hanger-Garderobe. Der Webserver muss slbot dafür nicht erreichen. Es gibt kein Intervall; nach WEAR, ADD oder REMOVE kommt höchstens eine einmalige Nachprüfung.
+Oben neben dem Titel sitzt ein Punkt und der Button **Status prüfen**. Ein Klick (und einmal beim Laden der Seite) fragt `api/status.php`. Der Aufruf pingt das Skript im OpenCollar über die registrierte HTTP-in-URL — derselbe Weg wie WEAR, wie bei einer Hanger-Garderobe. Der Webserver muss slbot dafür nicht erreichen. Es gibt kein Intervall; nach WEAR, ADD, REMOVE oder TP kommt höchstens eine einmalige Nachprüfung.
 
 - **grün**, wenn das Collar-Skript innerhalb des Timeouts antwortet (Avatar ist in Second Life); daneben der Regionsname
 - **grau**, wenn keine URL registriert ist, die URL veraltet ist oder das Skript nicht antwortet

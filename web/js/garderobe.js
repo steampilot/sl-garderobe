@@ -22,9 +22,14 @@
   const stuffBackdrop = $('#stuff-backdrop');
   const stuffList = $('#stuff-list');
   const stuffClose = $('#stuff-close');
+  const tpToggle = $('#tp-toggle');
+  const tpPanel = $('#tp-panel');
+  const tpList = $('#tp-list');
+  const tpClose = $('#tp-close');
 
   let all = [];
   let stuff = [];
+  let teleports = [];
   let people = [{ id: 'layla', name: 'Layla', img: 'Layla' }];
   let who = 'layla';
   let index = 0;
@@ -184,16 +189,76 @@
     });
   }
 
+  function renderTeleports() {
+    tpList.innerHTML = '';
+    if (!teleports.length) {
+      const li = document.createElement('li');
+      li.className = 'stuff-empty';
+      li.textContent = 'Keine Teleports eingetragen.';
+      tpList.appendChild(li);
+      return;
+    }
+    teleports.forEach((t) => {
+      const li = document.createElement('li');
+      li.className = 'stuff-item tp-item';
+      li.dataset.id = t.id;
+
+      const info = document.createElement('div');
+      info.className = 'stuff-info';
+      const title = document.createElement('h3');
+      title.textContent = t.name;
+      info.appendChild(title);
+      if (t.todo) {
+        const note = document.createElement('p');
+        note.className = 'tp-todo';
+        note.textContent = 'Ort noch unbestätigt';
+        info.appendChild(note);
+      }
+
+      const actions = document.createElement('div');
+      actions.className = 'stuff-actions';
+      const goBtn = document.createElement('button');
+      goBtn.type = 'button';
+      goBtn.className = 'tp-go';
+      goBtn.textContent = 'GO';
+      goBtn.disabled = busy;
+      goBtn.addEventListener('click', () => teleportTo(t));
+      actions.appendChild(goBtn);
+
+      li.appendChild(info);
+      li.appendChild(actions);
+      tpList.appendChild(li);
+    });
+  }
+
+  function backdropVisible() {
+    return !stuffPanel.hidden || !tpPanel.hidden;
+  }
+
   function setStuffOpen(open) {
+    if (open) setTpOpen(false);
     stuffPanel.hidden = !open;
-    stuffBackdrop.hidden = !open;
     stuffToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
     document.body.classList.toggle('stuff-open', open);
+    stuffBackdrop.hidden = !backdropVisible();
+  }
+
+  function setTpOpen(open) {
+    if (open) {
+      stuffPanel.hidden = true;
+      stuffToggle.setAttribute('aria-expanded', 'false');
+      document.body.classList.remove('stuff-open');
+    }
+    tpPanel.hidden = !open;
+    tpToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    document.body.classList.toggle('tp-open', open);
+    stuffBackdrop.hidden = !backdropVisible();
   }
 
   function openApp(data) {
     all = data.outfits || data;
     stuff = data.stuff || [];
+    teleports = data.teleports || [];
     if (data.people && data.people.length) people = data.people;
     who = (people[0] && people[0].id) || 'layla';
     index = 0;
@@ -202,6 +267,7 @@
     });
     showLook(false);
     renderStuff();
+    renderTeleports();
     checkStatus();
   }
 
@@ -252,9 +318,18 @@
     setStuffOpen(stuffPanel.hidden);
   });
   stuffClose.addEventListener('click', () => setStuffOpen(false));
-  stuffBackdrop.addEventListener('click', () => setStuffOpen(false));
+  tpToggle.addEventListener('click', () => {
+    setTpOpen(tpPanel.hidden);
+  });
+  tpClose.addEventListener('click', () => setTpOpen(false));
+  stuffBackdrop.addEventListener('click', () => {
+    setStuffOpen(false);
+    setTpOpen(false);
+  });
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && !stuffPanel.hidden) setStuffOpen(false);
+    if (e.key !== 'Escape') return;
+    if (!stuffPanel.hidden) setStuffOpen(false);
+    if (!tpPanel.hidden) setTpOpen(false);
   });
 
   document.addEventListener('keydown', (e) => {
@@ -341,6 +416,36 @@
       setStatus('Verbindung hat nicht geklappt', 'err');
     }
     busy = false;
+    renderStuff();
+  }
+
+  async function teleportTo(t) {
+    if (!t || busy) return;
+    busy = true;
+    renderTeleports();
+    renderStuff();
+    setStatus('Teleport nach ' + t.name + ' …');
+    try {
+      const r = await fetch('api/tp.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify({ id: t.id }),
+      });
+      const j = await r.json();
+      if (!j.ok) {
+        setStatus(j.error || 'Hat nicht geklappt', 'err');
+      } else if (j.lsl) {
+        setStatus('Ich springe nach ' + t.name + '.', 'ok');
+        setTimeout(checkStatus, 4000);
+      } else {
+        setStatus('Das Skript ist gerade nicht verbunden.', 'err');
+      }
+    } catch {
+      setStatus('Verbindung hat nicht geklappt', 'err');
+    }
+    busy = false;
+    renderTeleports();
     renderStuff();
   }
 

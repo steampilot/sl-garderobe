@@ -281,6 +281,142 @@ function notify_action(array $config, string $kind, string $folder, string $id, 
     @file_put_contents(data_path('wear.log'), $line, FILE_APPEND | LOCK_EX);
 }
 
+function default_teleports(): array {
+    // Config-Form: nur name + url (SLurl). Koordinaten kommen aus der URL.
+    return [
+        [
+            'name' => 'Brysk',
+            'url' => 'https://maps.secondlife.com/secondlife/Brysk/203.92/145.50/30.81',
+        ],
+        [
+            'name' => "Nille's Hangout",
+            'url' => 'https://maps.secondlife.com/secondlife/Mesa%20Island/197/161/3003',
+        ],
+        [
+            'name' => 'The Beach',
+            'url' => 'https://maps.secondlife.com/secondlife/Andromede/159.2/134.1/28.1',
+            'todo' => true, // Wild Breeze — Ort noch unbestätigt
+        ],
+    ];
+}
+
+function blocked_regions(array $config): array {
+    $hard = ['Golden Dawn', 'Haven Woods'];
+    $list = $config['blocked_regions'] ?? [];
+    if (!is_array($list)) $list = [];
+    $out = [];
+    $seen = [];
+    foreach (array_merge($hard, $list) as $name) {
+        $name = trim((string)$name);
+        if ($name === '') continue;
+        $key = mb_strtolower($name);
+        if (isset($seen[$key])) continue;
+        $seen[$key] = true;
+        $out[] = $name;
+    }
+    return $out;
+}
+
+function normalize_region_name(string $region): string {
+    $region = trim($region);
+    $region = preg_replace('/[\/:=,&@"\\\\\r\n]+/', '', $region) ?? '';
+    return trim($region);
+}
+
+function is_blocked_region(array $config, string $region): bool {
+    $needle = mb_strtolower(normalize_region_name($region));
+    if ($needle === '') return true;
+    foreach (blocked_regions($config) as $b) {
+        if (mb_strtolower(normalize_region_name((string)$b)) === $needle) return true;
+    }
+    return false;
+}
+
+function valid_sl_coord(mixed $v, bool $isZ = false): ?float {
+    if (is_string($v)) $v = trim($v);
+    if (!is_numeric($v)) return null;
+    $f = (float)$v;
+    if (!is_finite($f)) return null;
+    if ($isZ) {
+        if ($f < -50 || $f > 4096) return null;
+    } else {
+        if ($f < -10 || $f > 266) return null;
+    }
+    return $f;
+}
+
+/** Liest Region/x/y/z aus einer maps.secondlife.com- oder secondlife://-URL. */
+function parse_slurl(string $url): ?array {
+    $url = trim($url);
+    if ($url === '') return null;
+
+    $path = '';
+    if (preg_match('#^secondlife:///*(?:app/teleport/)?(.+)$#i', $url, $m)) {
+        $path = $m[1];
+    } elseif (preg_match('#^https?://(?:maps\\.secondlife\\.com|slurl\\.com)/secondlife/(.+)$#i', $url, $m)) {
+        $path = $m[1];
+    } else {
+        return null;
+    }
+
+    $path = preg_replace('/[?#].*$/', '', $path) ?? $path;
+    $path = trim($path, '/');
+    $parts = explode('/', $path);
+    if (count($parts) < 4) return null;
+
+    $region = normalize_region_name(rawurldecode($parts[0]));
+    $x = valid_sl_coord(rawurldecode($parts[1]), false);
+    $y = valid_sl_coord(rawurldecode($parts[2]), false);
+    $z = valid_sl_coord(rawurldecode($parts[3]), true);
+    if ($region === '' || $x === null || $y === null || $z === null) return null;
+    return ['region' => $region, 'x' => $x, 'y' => $y, 'z' => $z];
+}
+
+function configured_teleports(array $config): array {
+    $list = $config['teleports'] ?? null;
+    if (!is_array($list) || $list === []) return default_teleports();
+    return $list;
+}
+
+function teleport_slug(string $name): string {
+    $s = mb_strtolower(trim($name));
+    $s = strtr($s, ["'" => '', 'ä' => 'ae', 'ö' => 'oe', 'ü' => 'ue', 'ß' => 'ss']);
+    $s = preg_replace('/[^a-z0-9]+/', '-', $s) ?? '';
+    return trim($s, '-');
+}
+
+function teleport_id(array $t): string {
+    if (!empty($t['id'])) {
+        return preg_replace('/[^a-z0-9\-]/', '', (string)$t['id']) ?? '';
+    }
+    return teleport_slug((string)($t['name'] ?? ''));
+}
+
+function teleport_by_id(array $config, string $id): ?array {
+    foreach (configured_teleports($config) as $t) {
+        if (teleport_id($t) === $id) return $t;
+    }
+    return null;
+}
+
+function public_teleports(array $config): array {
+    $out = [];
+    foreach (configured_teleports($config) as $t) {
+        $id = teleport_id($t);
+        $name = trim((string)($t['name'] ?? ''));
+        $parsed = parse_slurl((string)($t['url'] ?? ''));
+        if ($id === '' || $name === '' || $parsed === null) continue;
+        if (is_blocked_region($config, $parsed['region'])) continue;
+        $row = [
+            'id' => $id,
+            'name' => $name,
+        ];
+        if (!empty($t['todo'])) $row['todo'] = true;
+        $out[] = $row;
+    }
+    return $out;
+}
+
 // Sendet einen einzelnen Textbefehl an slbot (POST auf bot_url). Nur von internen Endpunkten aufrufen.
 // Gibt [ok, body] zurück. Timeout und Verbindungsfehler werden als [false, grund] gemeldet.
 function bot_command(array $config, string $cmd, int $timeout = 3): array {

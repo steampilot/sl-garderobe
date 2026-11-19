@@ -20,6 +20,9 @@
 //   add:    @attachallover:Stuff/<Foldername>=force
 //   remove: @detachall:Stuff/<Foldername>=force
 //
+// Bei TP (op=tp): @tpto:<Region>/<x>/<y>/<z>=force
+//   Golden Dawn und Haven Woods werden abgelehnt.
+//
 // Nur die genannten Ordner unter #RLV werden angefasst.
 // Körperteile liegen in #RLV/.body(nostrip)/ und bleiben unberührt.
 // Niemals @detachall ohne Ordner — sonst fielen Halsband und Collar.
@@ -303,6 +306,10 @@ default
         string parent = PARENT;
         string op = "wear";
         float wait = WAIT;
+        string region;
+        string x;
+        string y;
+        string z;
 
         list parts = llParseString2List(body, ["&"], []);
         integer i;
@@ -319,6 +326,10 @@ default
                 if (k == "parent") parent = v;
                 if (k == "wait")   wait   = (float)v;
                 if (k == "op")     op     = llToLower(v);
+                if (k == "region") region = v;
+                if (k == "x")      x      = v;
+                if (k == "y")      y      = v;
+                if (k == "z")      z      = v;
             }
         }
 
@@ -337,6 +348,34 @@ default
         if (gBusy)
         {
             llHTTPResponse(id, 429, "{\"ok\":false,\"error\":\"busy\"}");
+            return;
+        }
+
+        if (op == "tp" || op == "tpto")
+        {
+            if (gPingWait)
+            {
+                finishPing();
+                llSetTimerEvent(0.0);
+            }
+            region = llStringTrim(safeName(region), STRING_TRIM);
+            string rlow = llToLower(region);
+            if (region == "" || rlow == "golden dawn" || rlow == "haven woods")
+            {
+                llHTTPResponse(id, 400, "{\"ok\":false,\"error\":\"region\"}");
+                return;
+            }
+            x = llStringTrim(x, STRING_TRIM);
+            y = llStringTrim(y, STRING_TRIM);
+            z = llStringTrim(z, STRING_TRIM);
+            if (x == "" || y == "" || z == "")
+            {
+                llHTTPResponse(id, 400, "{\"ok\":false,\"error\":\"coords\"}");
+                return;
+            }
+            llHTTPResponse(id, 200, "{\"ok\":true,\"region\":\"" + region + "\"}");
+            llOwnerSay("@tpto:" + region + "/" + x + "/" + y + "/" + z + "=force");
+            llOwnerSay("Garderobe: teleportiere nach " + region + " " + x + "/" + y + "/" + z + ".");
             return;
         }
 

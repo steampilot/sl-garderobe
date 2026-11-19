@@ -13,6 +13,27 @@ return [
     // dient outfit-worn als Fallback, falls der Collar-Ping die Flags nicht liefert.
     // 'bot_url' => 'http://127.0.0.1:8765/',
     'stuff_parent' => 'Stuff',
+    // Immer gesperrt, auch wenn diese Liste fehlt oder geändert wird.
+    'blocked_regions' => ['Golden Dawn', 'Haven Woods'],
+    // Teleport-Panel (links). Pro Eintrag nur name + url (SLurl).
+    // URL: https://maps.secondlife.com/secondlife/Region/x/y/z
+    //   oder secondlife://Region/x/y/z
+    // 'todo' => true markiert einen noch unbestätigten Ort in der Liste.
+    'teleports' => [
+        [
+            'name' => 'Brysk',
+            'url' => 'https://maps.secondlife.com/secondlife/Brysk/203.92/145.50/30.81',
+        ],
+        [
+            'name' => "Nille's Hangout",
+            'url' => 'https://maps.secondlife.com/secondlife/Mesa%20Island/197/161/3003',
+        ],
+        [
+            'name' => 'The Beach',
+            'url' => 'https://maps.secondlife.com/secondlife/Andromede/159.2/134.1/28.1',
+            'todo' => true, // Wild Breeze — Ort noch unbestätigt
+        ],
+    ],
     // Vorerst nur Layla. Weitere Avatare (jerome, cindy, caprica) später wieder
     // hier eintragen — deren Collar funktioniert anders und wird gerade nicht gebraucht.
     'people' => [
