@@ -74,7 +74,7 @@ string safeName(string s)
     {
         string c = llGetSubString(s, i, i);
         if (c != "/" && c != ":" && c != "=" && c != "," && c != "&"
-            && c != "@" && c != "\"" && c != "\\" && c != "\n" && c != "\r")
+            && c != "@" && c != "\"" && c != "\\" && c != "\n")
             out += c;
     }
     return out;
