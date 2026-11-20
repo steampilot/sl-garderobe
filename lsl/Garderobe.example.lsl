@@ -328,7 +328,7 @@ default
         integer i;
         for (i = 0; i < llGetListLength(parts); i += 1)
         {
-            string p = llList2String(parts, i);
+            string p = llReplaceSubString(llList2String(parts, i), "+", " ", 0);
             integer eq = llSubStringIndex(p, "=");
             if (eq > 0)
             {

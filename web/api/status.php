@@ -26,7 +26,7 @@ if ($url === '') {
         'token' => $config['token'],
         'op' => 'ping',
         'who' => $who,
-    ]);
+    ], '', '&', PHP_QUERY_RFC3986);
     [$ok, $resp] = garderobe_post_lsl($url, $body, (string)$config['token'], 4000, 10);
     if ($ok) {
         $ping = parse_lsl_ping($resp);

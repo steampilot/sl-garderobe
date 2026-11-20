@@ -41,7 +41,7 @@ if ($url !== '') {
         'op' => 'wear',
         'id' => $id,
         'who' => $who,
-    ]);
+    ], '', '&', PHP_QUERY_RFC3986);
     [$lslOk, $lslDetail] = garderobe_post_lsl($url, $body, (string)$config['token']);
 } else {
     $lslDetail = 'kein Skript registriert für ' . $who;

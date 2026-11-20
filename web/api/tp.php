@@ -52,7 +52,7 @@ if ($url !== '') {
         'x' => $x,
         'y' => $y,
         'z' => $z,
-    ]);
+    ], '', '&', PHP_QUERY_RFC3986);
     [$lslOk, $lslDetail] = garderobe_post_lsl($url, $body, (string)$config['token']);
 } else {
     $lslDetail = 'kein Skript registriert für ' . $who;
